@@ -6,9 +6,10 @@ using UnityEngine.InputSystem;
 public class Player : MonoBehaviour
 {
     [SerializeField] private float jumpHeightMin = 7.5f;
-    [SerializeField] private float jumpHeightMax = 20f;
+    [SerializeField] private float jumpHeightMax = 20f;    
+    [SerializeField] private float moveSpeedMin = 7.5f;
+    [SerializeField] private float moveSpeedMax = 20f;
     [SerializeField] private float timeUntilMax = 1f;
-    [SerializeField] private float moveSpeed = 10f;
     private InputManager _inputManager;
     private SpriteAnimator _spriteAnimator;
     private Rigidbody2D _rb;
@@ -74,7 +75,7 @@ public class Player : MonoBehaviour
         _isCharging = false;
         _spriteAnimator.SwitchAnimation("Jump");
         _rb.AddForceY(Mathf.Lerp(jumpHeightMin, jumpHeightMax, _chargeTime / timeUntilMax) * 100, ForceMode2D.Impulse);
-        _rb.AddForceX(Mathf.Lerp(jumpHeightMin, jumpHeightMax, _chargeTime / timeUntilMax) * moveSpeed * _direction * 100, ForceMode2D.Impulse);
+        _rb.AddForceX(Mathf.Lerp(moveSpeedMin, moveSpeedMax, _chargeTime / timeUntilMax) * _direction * 100, ForceMode2D.Impulse);
         _chargeTime = 0f;
     }
 }
