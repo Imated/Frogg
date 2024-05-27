@@ -660,10 +660,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46edd70e19d37c64c841728e553d42f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpHeightMin: 4
-  jumpHeightMax: 20
-  moveSpeedMin: 3.5
-  moveSpeedMax: 12.5
+  jumpHeightMin: 2
+  jumpHeightMax: 10
+  moveSpeedMin: 2
+  moveSpeedMax: 6
   timeUntilMax: 0.65
 --- !u!114 &1248908899
 MonoBehaviour:

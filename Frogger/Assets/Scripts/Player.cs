@@ -74,8 +74,8 @@ public class Player : MonoBehaviour
             return;
         _isCharging = false;
         _spriteAnimator.SwitchAnimation("Jump");
-        _rb.AddForceY(Mathf.Lerp(jumpHeightMin, jumpHeightMax, _chargeTime / timeUntilMax) * 100, ForceMode2D.Impulse);
-        _rb.AddForceX(Mathf.Lerp(moveSpeedMin, moveSpeedMax, _chargeTime / timeUntilMax) * _direction * 100, ForceMode2D.Impulse);
+        _rb.AddForceY(Mathf.Lerp(jumpHeightMin, jumpHeightMax, _chargeTime / timeUntilMax) * 10000, ForceMode2D.Force);
+        _rb.AddForceX(Mathf.Lerp(moveSpeedMin, moveSpeedMax, _chargeTime / timeUntilMax) * _direction * 10000, ForceMode2D.Force);
         _chargeTime = 0f;
     }
 }
