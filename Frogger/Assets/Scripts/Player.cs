@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -23,7 +21,12 @@ public class Player : MonoBehaviour
     [Range(0.1f, 5.0f), SerializeField] private float groundRayOffset = 0.5f;
     [Range(-5.0f, 5.0f), SerializeField] private float groundRayXOffset = 0.5f;
     [Range(0.01f, 0.5f), SerializeField] private float groundSideRayOffset = 0.5f;
-
+    [Header("Wall Check")]
+    [SerializeField] private LayerMask wallLayerMask;
+    [Range(0.1f, 5.0f), SerializeField] private float wallRayLength = 0.25f;
+    [Range(0.1f, 5.0f), SerializeField] private float wallRayOffset = 0.5f;
+    [Range(-5.0f, 5.0f), SerializeField] private float wallRayXOffset = 0.5f;
+    [Range(0.01f, 0.5f), SerializeField] private float wallSideRayOffset = 0.5f;
     
     private InputManager _inputManager;
     private SpriteAnimator _spriteAnimator;
@@ -32,8 +35,9 @@ public class Player : MonoBehaviour
     private Rigidbody2D _rb;
     private bool _isCharging;
     private float _chargeTime;
-    private bool _wasGrounded;
     private bool _isGrounded;
+    private bool _isTouchingLeftWall;
+    private bool _isTouchingRightWall;
     private int _direction = 1;
     private bool _canSwing;
     private int _currentlyActiveSwingPoint;
@@ -52,7 +56,35 @@ public class Player : MonoBehaviour
     private void Update()
     {
         GroundCheck();
+        WallCheck();
         
+        UpdateSwinging();
+        UpdateCharging();
+
+        if (Camera.main.ScreenToWorldPoint(Mouse.current.position.value).x < transform.position.x)
+        {
+            _spriteAnimator.FlipX(true);
+            _direction = -1;
+        }
+        else
+        {
+            _spriteAnimator.FlipX(false);
+            _direction = 1;
+        }
+
+        if (!_isGrounded && !_isTouchingRightWall && !_isTouchingLeftWall)
+        {
+            _rb.gravityScale = 1;
+            transform.rotation = Quaternion.Euler(Vector3.zero);
+        }
+        if(_isGrounded && !_isTouchingRightWall && !_isTouchingLeftWall)
+            _rb.rotation = 0f;
+    }
+    
+    #region Swing
+
+    private void UpdateSwinging()
+    {
         for (int i = 0; i < targetSwingObjects.Count; i++)
         {
             if (Vector2.Distance(targetSwingObjects[i].transform.position, transform.position) <= 20f)
@@ -72,23 +104,6 @@ public class Player : MonoBehaviour
         
         if(Input.GetMouseButtonUp(0) && _isSwinging)
             StopSwing();
-        
-        if (_isCharging && _chargeTime < timeUntilMax)
-        {
-            _chargeTime += Time.deltaTime;
-            _chargeTime = Mathf.Clamp(_chargeTime, 0f, timeUntilMax);
-        }
-
-        if (Camera.main.ScreenToWorldPoint(Mouse.current.position.value).x < transform.position.x)
-        {
-            _spriteAnimator.FlipX(true);
-            _direction = -1;
-        }
-        else
-        {
-            _spriteAnimator.FlipX(false);
-            _direction = 1;
-        }
     }
     
     private void StartSwing()
@@ -117,12 +132,18 @@ public class Player : MonoBehaviour
         _rb.drag = 0;
     }
 
-    private bool InRange(Vector2 target)
+    #endregion
+
+    #region Jumping
+    private void UpdateCharging()
     {
-        return radius >= Vector2.Distance(transform.position, target) || _isSwinging;
+        if (_isCharging && _chargeTime < timeUntilMax)
+        {
+            _chargeTime += Time.deltaTime;
+            _chargeTime = Mathf.Clamp(_chargeTime, 0f, timeUntilMax);
+        }
     }
-
-
+    
     private void OnJump(bool startedJumping)
     {
         if(!_isGrounded)
@@ -150,21 +171,49 @@ public class Player : MonoBehaviour
         _rb.AddForceX(Mathf.Lerp(moveSpeedMin, moveSpeedMax, _chargeTime / timeUntilMax) * _direction * 10000, ForceMode2D.Force);
         _chargeTime = 0f;
     }
+    #endregion
     
     private void GroundCheck() 
     {
         var grounded = _raySensor.Cast(groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, groundLayerMask, Vector3.down);
-        _isGrounded = grounded;
-        if (_isGrounded && !_wasGrounded)
+        if (grounded && !_isGrounded)
             _spriteAnimator.SwitchAnimation("Land");
-        _wasGrounded = _isGrounded;
+        _isGrounded = grounded || _isTouchingRightWall || _isTouchingLeftWall;
     }
+
+    private void WallCheck()
+    {
+        var leftWall = _raySensor.Cast(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.left);
+        if (leftWall && !_isTouchingLeftWall)
+            StickToWall(-90f);
+        _isTouchingLeftWall = leftWall;
+        var rightWall = _raySensor.Cast(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.right);
+        if (rightWall && !_isTouchingRightWall)
+            StickToWall(90f);
+        _isTouchingRightWall = rightWall;
+    }
+
+    private void StickToWall(float surfaceAngle)
+    {
+        _spriteAnimator.SwitchAnimation("Land");
+        _rb.gravityScale = 0;
+        transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, surfaceAngle));
+        _rb.velocity = Vector2.zero;
+        _rb.rotation = surfaceAngle;
+    }
+    
+    private bool InRange(Vector2 target)
+    {
+        return radius >= Vector2.Distance(transform.position, target) || _isSwinging;
+    }
+    
     private void OnDrawGizmos() 
     {
         if (!_raySensor)
             _raySensor = GetComponent<RaySensor>();
         
         _raySensor.CastGizmos(Color.cyan, groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, Vector3.down);
+        _raySensor.CastGizmos(Color.red, wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, Vector3.right);
+        _raySensor.CastGizmos(Color.red, wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, Vector3.left);
     }
-
 }

@@ -856,7 +856,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46edd70e19d37c64c841728e553d42f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpHeightMin: 2
+  jumpHeightMin: 3
   jumpHeightMax: 10
   moveSpeedMin: 2
   moveSpeedMax: 6
@@ -873,6 +873,13 @@ MonoBehaviour:
   groundRayOffset: 0.5
   groundRayXOffset: 0
   groundSideRayOffset: 0.5
+  wallLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  wallRayLength: 0.4
+  wallRayOffset: 0.5
+  wallRayXOffset: 0
+  wallSideRayOffset: 0.5
 --- !u!114 &1248908899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1001,7 +1008,7 @@ GameObject:
   - component: {fileID: 1390616541}
   - component: {fileID: 1390616540}
   - component: {fileID: 1390616542}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Swing Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
