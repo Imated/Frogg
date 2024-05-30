@@ -13,6 +13,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Transform visual;
     [Header("Swinging")]
     [SerializeField] private List<GameObject> targetSwingObjects;
+    [SerializeField] private Transform swingPoint;
     [SerializeField] private float radius;
     [SerializeField] private float swingSpeedMult = 1.0005f;
     [SerializeField] private LineRenderer swingLine;
@@ -129,7 +130,7 @@ public class Player : MonoBehaviour
         swingLine.enabled = true;
         _distanceJoint.enabled = true;
         _rb.drag = 0.25f;
-        swingLine.SetPosition(1, transform.position);
+        swingLine.SetPosition(1, swingPoint.position);
         swingLine.DoSetPosition(1, targetSwingObjects[_currentlyActiveSwingPoint].transform.position, 0.2f);
         Invoke(nameof(StopSwing), 5f);
     }
@@ -137,7 +138,7 @@ public class Player : MonoBehaviour
     private void Swing()
     {
         _rb.velocity *= swingSpeedMult;
-        swingLine.SetPosition(0, transform.position);
+        swingLine.SetPosition(0, swingPoint.position);
         
     }
     
