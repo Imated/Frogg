@@ -88,6 +88,14 @@ public class Player : MonoBehaviour
 
         if (!_isGrounded && !_isTouchingRightWall && !_isTouchingLeftWall && !_isTouchingUpWall)
             UnStickToWall();
+        if(_spriteAnimator.GetCurrentAnimation() == "Idle" && _isSwinging)
+            _spriteAnimator.SwitchAnimation("Idle Mouth", true);
+        if(_spriteAnimator.GetCurrentAnimation() == "Idle Mouth" && !_isSwinging)
+            _spriteAnimator.SwitchAnimation("Idle", true);
+        if(_spriteAnimator.GetCurrentAnimation() == "Jump" && _isSwinging)
+            _spriteAnimator.SwitchAnimation("Jump Mouth", true);
+        if(_spriteAnimator.GetCurrentAnimation() == "Jump Mouth" && !_isSwinging)
+            _spriteAnimator.SwitchAnimation("Jump", true);
     }
     
     #region Swing
@@ -130,6 +138,7 @@ public class Player : MonoBehaviour
     {
         _rb.velocity *= swingSpeedMult;
         swingLine.SetPosition(0, transform.position);
+        
     }
     
     private void StopSwing()
@@ -156,6 +165,8 @@ public class Player : MonoBehaviour
     private void OnJump(bool startedJumping)
     {
         if(!_isGrounded && !_isTouchingRightWall && !_isTouchingLeftWall && !_isTouchingUpWall)
+            return;
+        if(_isSwinging)
             return;
         if(startedJumping)
             StartCharge();
@@ -195,15 +206,15 @@ public class Player : MonoBehaviour
 
     private void WallCheck()
     {
-        var leftWall = _raySensor.Cast(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.left);
+        var leftWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.left);
         if (leftWall && !_isTouchingLeftWall)
             StickToWall(-90f);
         _isTouchingLeftWall = leftWall;
-        var rightWall = _raySensor.Cast(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.right);
+        var rightWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.right);
         if (rightWall && !_isTouchingRightWall)
             StickToWall(90f);
         _isTouchingRightWall = rightWall;
-        var upWall = _raySensor.Cast(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.up);
+        var upWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.up);
         if (upWall && !_isTouchingUpWall)
             StickToWall(180f);
         _isTouchingUpWall = upWall;

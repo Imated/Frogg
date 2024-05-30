@@ -1416,7 +1416,7 @@ Transform:
   m_GameObject: {fileID: 1100923050}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1, y: -4, z: 0}
+  m_LocalPosition: {x: 0, y: -4, z: 0}
   m_LocalScale: {x: 1.5, y: 20, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1762,6 +1762,24 @@ MonoBehaviour:
     - {fileID: 7164480163934724952, guid: 300676b40b1e56248b4114774455a5ce, type: 3}
     - {fileID: 4691283416695914216, guid: 300676b40b1e56248b4114774455a5ce, type: 3}
     - {fileID: -8498602225367734203, guid: 300676b40b1e56248b4114774455a5ce, type: 3}
+  - animationId: Idle Mouth
+    nextAnimation: 
+    animationFrameRate: 3
+    loop: 1
+    animationFrames:
+    - {fileID: -3477873056492582659, guid: 4ad6c9b628fa94f4b9da7f09c1d9d518, type: 3}
+    - {fileID: -7031428504891916821, guid: 4ad6c9b628fa94f4b9da7f09c1d9d518, type: 3}
+    - {fileID: -1480790072978074976, guid: 4ad6c9b628fa94f4b9da7f09c1d9d518, type: 3}
+    - {fileID: 5055287349864391344, guid: 4ad6c9b628fa94f4b9da7f09c1d9d518, type: 3}
+    - {fileID: -1145770619421168224, guid: 4ad6c9b628fa94f4b9da7f09c1d9d518, type: 3}
+    - {fileID: 6488101783651716104, guid: 4ad6c9b628fa94f4b9da7f09c1d9d518, type: 3}
+    - {fileID: -2027628984856112365, guid: 4ad6c9b628fa94f4b9da7f09c1d9d518, type: 3}
+    - {fileID: -7031428504891916821, guid: 4ad6c9b628fa94f4b9da7f09c1d9d518, type: 3}
+    - {fileID: -1480790072978074976, guid: 4ad6c9b628fa94f4b9da7f09c1d9d518, type: 3}
+    - {fileID: 5055287349864391344, guid: 4ad6c9b628fa94f4b9da7f09c1d9d518, type: 3}
+    - {fileID: 5588246166897326500, guid: 4ad6c9b628fa94f4b9da7f09c1d9d518, type: 3}
+    - {fileID: -209366790734900348, guid: 4ad6c9b628fa94f4b9da7f09c1d9d518, type: 3}
+    - {fileID: -3705468970532559730, guid: 4ad6c9b628fa94f4b9da7f09c1d9d518, type: 3}
   - animationId: Charge
     nextAnimation: 
     animationFrameRate: 4
@@ -1788,6 +1806,13 @@ MonoBehaviour:
     - {fileID: 8121019622652479436, guid: 14ae61338f2a78c4b89a27006642771f, type: 3}
     - {fileID: -2216230646834857397, guid: 14ae61338f2a78c4b89a27006642771f, type: 3}
     - {fileID: -6027395786302924326, guid: 14ae61338f2a78c4b89a27006642771f, type: 3}
+  - animationId: Jump Mouth
+    nextAnimation: 
+    animationFrameRate: 12
+    loop: 0
+    animationFrames:
+    - {fileID: -5688112393362717333, guid: c0c078a17132ec14eae1031562014421, type: 3}
+    - {fileID: -6853405271478859694, guid: c0c078a17132ec14eae1031562014421, type: 3}
 --- !u!1 &1835938772
 GameObject:
   m_ObjectHideFlags: 0
@@ -1844,7 +1869,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: b6347781f0c95534f8d2715460eed0d8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1885,7 +1910,7 @@ LineRenderer:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 0.16455716
+        value: 0.24683255
         inSlope: -0.29737428
         outSlope: -0.29737428
         tangentMode: 0
@@ -1897,8 +1922,8 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.8679245, g: 0.2251691, b: 0.35277486, a: 1}
-      key1: {r: 0.87058824, g: 0.22745098, b: 0.3529412, a: 1}
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
       key2: {r: 0.6039216, g: 0.07450981, b: 0.1764706, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}

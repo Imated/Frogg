@@ -56,16 +56,20 @@ public class SpriteAnimator : MonoBehaviour
         SwitchAnimation(animations[index]);
     }
 
-    public void SwitchAnimation(SpriteSet animation)
+    public void SwitchAnimation(SpriteSet animation, bool seamless = false)
     {
         if (_currentAnimation == animation)
             return;
-        ResetTimer(animation);
-        _animationIndex = 0;
+        if (!seamless)
+        {
+            _animationIndex = 0;
+            ResetTimer(animation);
+        }
+
         _currentAnimation = animation;
     }
 
-    public void SwitchAnimation(string animation)
+    public void SwitchAnimation(string animation, bool seamless = false)
     {
         if (_currentAnimation.animationId == animation)
             return;
@@ -73,7 +77,7 @@ public class SpriteAnimator : MonoBehaviour
         {
             if (anim.animationId == animation)
             {
-                SwitchAnimation(anim);
+                SwitchAnimation(anim, seamless);
                 break;
             }
         }
