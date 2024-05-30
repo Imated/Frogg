@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
     [Range(0.1f, 5.0f), SerializeField] private float groundRayLength = 0.25f;
     [Range(0.1f, 5.0f), SerializeField] private float groundRayOffset = 0.5f;
     [Range(-5.0f, 5.0f), SerializeField] private float groundRayXOffset = 0.5f;
-    [Range(0.01f, 0.5f), SerializeField] private float groundSideRayOffset = 0.5f;
+    [Range(0.01f, 1f), SerializeField] private float groundSideRayOffset = 0.5f;
     [Header("Wall Check")]
     [SerializeField] private LayerMask wallLayerMask;
     [Range(0.1f, 5.0f), SerializeField] private float wallRayLength = 0.25f;

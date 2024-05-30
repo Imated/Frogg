@@ -156,7 +156,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 64
+        y: 66
         width: 32
         height: 32
       alignment: 0
@@ -178,8 +178,8 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 64
-        width: 32
+        y: 66
+        width: 34
         height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -199,8 +199,8 @@ TextureImporter:
       name: GroundTileset_2
       rect:
         serializedVersion: 2
-        x: 64
-        y: 64
+        x: 66
+        y: 66
         width: 32
         height: 32
       alignment: 0
@@ -224,7 +224,7 @@ TextureImporter:
         x: 0
         y: 32
         width: 32
-        height: 32
+        height: 34
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -245,8 +245,8 @@ TextureImporter:
         serializedVersion: 2
         x: 32
         y: 32
-        width: 32
-        height: 32
+        width: 34
+        height: 34
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -255,7 +255,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 23138a8ca6312da4ca96f8b09005d3ba
+      spriteID: ee6e0ece4e321d14c921d97563358559
       internalID: 978346325
       vertices: []
       indices: 
@@ -265,10 +265,10 @@ TextureImporter:
       name: GroundTileset_5
       rect:
         serializedVersion: 2
-        x: 64
+        x: 66
         y: 32
         width: 32
-        height: 32
+        height: 34
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -277,7 +277,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a9accc0c1f5600147af270fd5b6af8e3
+      spriteID: e20b292a1bb6882418c71d0eda606ceb
       internalID: -449853995
       vertices: []
       indices: 
@@ -299,7 +299,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b7d3b27dc97ada643b4f84d2cd7c1e32
+      spriteID: ed6856f914c05a0498a8db6055ebe7f7
       internalID: 31138744
       vertices: []
       indices: 
@@ -311,7 +311,7 @@ TextureImporter:
         serializedVersion: 2
         x: 32
         y: 0
-        width: 32
+        width: 34
         height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -321,7 +321,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 83cc98293b6f5c84c89147a815fa6aa3
+      spriteID: d3311776ec0385e48a3cc49b4d39c3fd
       internalID: 810825430
       vertices: []
       indices: 
@@ -331,7 +331,7 @@ TextureImporter:
       name: GroundTileset_8
       rect:
         serializedVersion: 2
-        x: 64
+        x: 66
         y: 0
         width: 32
         height: 32
@@ -343,7 +343,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 75ce72312ae293a458bcb7506d04dd76
+      spriteID: d49c2007f246cc84e85568e3ea0d4b12
       internalID: -15139290
       vertices: []
       indices: 
