@@ -920,7 +920,7 @@ MonoBehaviour:
   wallRayLength: 0.5
   wallRayOffset: 0.5
   wallRayXOffset: 0
-  wallSideRayOffset: 0.5
+  wallSideRayOffset: 0.4
 --- !u!114 &1248908899
 MonoBehaviour:
   m_ObjectHideFlags: 0
