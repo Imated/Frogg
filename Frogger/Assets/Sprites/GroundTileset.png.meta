@@ -48,7 +48,7 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 0
+  spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 16
@@ -189,8 +189,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4fd32cb61a74dba4c8442a3c30279ff9
-      internalID: 593584938
+      spriteID: 2713e02a0cac91f41a182b635767861c
+      internalID: -1967590606
       vertices: []
       indices: 
       edges: []
@@ -211,8 +211,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f27de3f51a90d804b8c40ad2bb244a5f
-      internalID: 703629990
+      spriteID: 145b83a595b98b745b85cd2e3d5561b2
+      internalID: -892836050
       vertices: []
       indices: 
       edges: []
@@ -221,8 +221,8 @@ TextureImporter:
       name: GroundTileset_3
       rect:
         serializedVersion: 2
-        x: 96
-        y: 64
+        x: 0
+        y: 32
         width: 32
         height: 32
       alignment: 0
@@ -233,8 +233,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 697e33fd6d73659478d6bbd1a4481150
-      internalID: 235621033
+      spriteID: cff6d65c43d2c0c4396e1328ec5d596e
+      internalID: 2132242113
       vertices: []
       indices: 
       edges: []
@@ -243,7 +243,7 @@ TextureImporter:
       name: GroundTileset_4
       rect:
         serializedVersion: 2
-        x: 0
+        x: 32
         y: 32
         width: 32
         height: 32
@@ -255,8 +255,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b34bb0f569127e94ca649f7db9c05276
-      internalID: 1884052414
+      spriteID: 23138a8ca6312da4ca96f8b09005d3ba
+      internalID: 978346325
       vertices: []
       indices: 
       edges: []
@@ -265,28 +265,6 @@ TextureImporter:
       name: GroundTileset_5
       rect:
         serializedVersion: 2
-        x: 32
-        y: 32
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 4d73f33041b60ea41a3986ac413a8db3
-      internalID: -1110498327
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: GroundTileset_6
-      rect:
-        serializedVersion: 2
         x: 64
         y: 32
         width: 32
@@ -299,36 +277,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 52bcf2db95bb0da4984d21044d2a41c8
-      internalID: 1921597513
+      spriteID: a9accc0c1f5600147af270fd5b6af8e3
+      internalID: -449853995
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: GroundTileset_7
-      rect:
-        serializedVersion: 2
-        x: 96
-        y: 32
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 956992a50ec204548941aa3dadffcb3b
-      internalID: -107234753
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: GroundTileset_8
+      name: GroundTileset_6
       rect:
         serializedVersion: 2
         x: 0
@@ -343,14 +299,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3297a6bacb00c5846a22f7a4fcd2348f
-      internalID: 805312138
+      spriteID: b7d3b27dc97ada643b4f84d2cd7c1e32
+      internalID: 31138744
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: GroundTileset_9
+      name: GroundTileset_7
       rect:
         serializedVersion: 2
         x: 32
@@ -365,14 +321,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1d8ea7e1076fe034a93c2fc28f74513b
-      internalID: -256713713
+      spriteID: 83cc98293b6f5c84c89147a815fa6aa3
+      internalID: 810825430
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: GroundTileset_10
+      name: GroundTileset_8
       rect:
         serializedVersion: 2
         x: 64
@@ -387,30 +343,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1988fd30fc1a78f4981447256dcf4597
-      internalID: -1689851311
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: GroundTileset_11
-      rect:
-        serializedVersion: 2
-        x: 96
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 2245b7392775e694aa46aaef04eaf64c
-      internalID: -395178790
+      spriteID: 75ce72312ae293a458bcb7506d04dd76
+      internalID: -15139290
       vertices: []
       indices: 
       edges: []
@@ -419,7 +353,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 909f120f7d8fe414ea92f0d57727d11a
+    spriteID: 53eb3c30b2bb19a4e847d499ecf5f74c
     internalID: 0
     vertices: []
     indices: 
@@ -428,17 +362,14 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       GroundTileset_0: -898201131174279650
-      GroundTileset_1: 593584938
-      GroundTileset_10: -1689851311
-      GroundTileset_11: -395178790
-      GroundTileset_2: 703629990
-      GroundTileset_3: 235621033
-      GroundTileset_4: 1884052414
-      GroundTileset_5: -1110498327
-      GroundTileset_6: 1921597513
-      GroundTileset_7: -107234753
-      GroundTileset_8: 805312138
-      GroundTileset_9: -256713713
+      GroundTileset_1: -1967590606
+      GroundTileset_2: -892836050
+      GroundTileset_3: 2132242113
+      GroundTileset_4: 978346325
+      GroundTileset_5: -449853995
+      GroundTileset_6: 31138744
+      GroundTileset_7: 810825430
+      GroundTileset_8: -15139290
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
