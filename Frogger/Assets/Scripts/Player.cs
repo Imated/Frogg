@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float moveSpeedMin = 7.5f;
     [SerializeField] private float moveSpeedMax = 20f;
     [SerializeField] private float timeUntilMax = 1f;
+    [SerializeField] private Transform visual;
     [Header("Swinging")]
     [SerializeField] private List<GameObject> targetSwingObjects;
     [SerializeField] private float radius;
@@ -38,15 +39,19 @@ public class Player : MonoBehaviour
     private bool _isGrounded;
     private bool _isTouchingLeftWall;
     private bool _isTouchingRightWall;
+    private bool _isTouchingUpWall;
     private int _direction = 1;
     private bool _canSwing;
     private int _currentlyActiveSwingPoint;
     private bool _isSwinging;
+    private bool _isSticking;
+    private float _stickingSurfaceAngle;
+    private bool _isUpsideDown;
 
     private void Awake()
     {
         _inputManager = GetComponent<InputManager>();
-        _spriteAnimator = GetComponent<SpriteAnimator>();
+        _spriteAnimator = GetComponentInChildren<SpriteAnimator>();
         _distanceJoint = GetComponent<DistanceJoint2D>();
         _raySensor = GetComponent<RaySensor>();
         _rb = GetComponent<Rigidbody2D>();
@@ -61,24 +66,28 @@ public class Player : MonoBehaviour
         UpdateSwinging();
         UpdateCharging();
 
-        if (Camera.main.ScreenToWorldPoint(Mouse.current.position.value).x < transform.position.x)
+        _isUpsideDown = _isSticking && Mathf.Abs(_stickingSurfaceAngle) > 90f;
+
+        if ((!_isSticking || _isUpsideDown) && Camera.main.ScreenToWorldPoint(Mouse.current.position.value).x < transform.position.x)
         {
-            _spriteAnimator.FlipX(true);
+            _spriteAnimator.FlipX(!_isUpsideDown);
             _direction = -1;
         }
-        else
+        else if((!_isSticking || _isUpsideDown) && Camera.main.ScreenToWorldPoint(Mouse.current.position.value).x >= transform.position.x)
         {
-            _spriteAnimator.FlipX(false);
+            _spriteAnimator.FlipX(_isUpsideDown);
             _direction = 1;
         }
-
-        if (!_isGrounded && !_isTouchingRightWall && !_isTouchingLeftWall)
+        else if (_isSticking && !(Mathf.Abs(_stickingSurfaceAngle) < 90f))
         {
-            _rb.gravityScale = 1;
-            transform.rotation = Quaternion.Euler(Vector3.zero);
+            if (_stickingSurfaceAngle < 0)
+                _direction = 1;
+            else
+                _direction = -1;
         }
-        if(_isGrounded && !_isTouchingRightWall && !_isTouchingLeftWall)
-            _rb.rotation = 0f;
+
+        if (!_isGrounded && !_isTouchingRightWall && !_isTouchingLeftWall && !_isTouchingUpWall)
+            UnStickToWall();
     }
     
     #region Swing
@@ -146,7 +155,7 @@ public class Player : MonoBehaviour
     
     private void OnJump(bool startedJumping)
     {
-        if(!_isGrounded)
+        if(!_isGrounded && !_isTouchingRightWall && !_isTouchingLeftWall && !_isTouchingUpWall)
             return;
         if(startedJumping)
             StartCharge();
@@ -167,8 +176,11 @@ public class Player : MonoBehaviour
             return;
         _isCharging = false;
         _spriteAnimator.SwitchAnimation("Jump");
-        _rb.AddForceY(Mathf.Lerp(jumpHeightMin, jumpHeightMax, _chargeTime / timeUntilMax) * 10000, ForceMode2D.Force);
-        _rb.AddForceX(Mathf.Lerp(moveSpeedMin, moveSpeedMax, _chargeTime / timeUntilMax) * _direction * 10000, ForceMode2D.Force);
+        if(!_isUpsideDown)
+            _rb.AddForceY(Mathf.Lerp(jumpHeightMin, jumpHeightMax, _chargeTime / timeUntilMax) * 10000);
+        else
+            _rb.AddForceY(Mathf.Lerp(jumpHeightMin, jumpHeightMax, _chargeTime / timeUntilMax) * -10000);
+        _rb.AddForceX(Mathf.Lerp(moveSpeedMin, moveSpeedMax, _chargeTime / timeUntilMax) * _direction * 10000);
         _chargeTime = 0f;
     }
     #endregion
@@ -178,7 +190,7 @@ public class Player : MonoBehaviour
         var grounded = _raySensor.Cast(groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, groundLayerMask, Vector3.down);
         if (grounded && !_isGrounded)
             _spriteAnimator.SwitchAnimation("Land");
-        _isGrounded = grounded || _isTouchingRightWall || _isTouchingLeftWall;
+        _isGrounded = grounded;
     }
 
     private void WallCheck()
@@ -191,15 +203,29 @@ public class Player : MonoBehaviour
         if (rightWall && !_isTouchingRightWall)
             StickToWall(90f);
         _isTouchingRightWall = rightWall;
+        var upWall = _raySensor.Cast(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.up);
+        if (upWall && !_isTouchingUpWall)
+            StickToWall(180f);
+        _isTouchingUpWall = upWall;
     }
 
     private void StickToWall(float surfaceAngle)
     {
+        if(_isSticking)
+            return;
         _spriteAnimator.SwitchAnimation("Land");
         _rb.gravityScale = 0;
-        transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, surfaceAngle));
+        visual.rotation = Quaternion.Euler(new Vector3(0f, 0f, surfaceAngle));
         _rb.velocity = Vector2.zero;
-        _rb.rotation = surfaceAngle;
+        _stickingSurfaceAngle = surfaceAngle;
+        _isSticking = true;
+    }
+
+    private void UnStickToWall()
+    {
+        _rb.gravityScale = 1;
+        visual.rotation = Quaternion.Euler(Vector3.zero);
+        _isSticking = false;
     }
     
     private bool InRange(Vector2 target)
@@ -215,5 +241,6 @@ public class Player : MonoBehaviour
         _raySensor.CastGizmos(Color.cyan, groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, Vector3.down);
         _raySensor.CastGizmos(Color.red, wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, Vector3.right);
         _raySensor.CastGizmos(Color.red, wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, Vector3.left);
+        _raySensor.CastGizmos(Color.red, wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, Vector3.up);
     }
 }

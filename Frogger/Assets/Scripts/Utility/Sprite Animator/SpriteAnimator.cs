@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class SpriteAnimator : MonoBehaviour
 {
+    public SpriteRenderer SpriteRenderer => _spriteRenderer;
+    
     [SerializeField] private bool playOnAwake;
     [Space(3)] 
     [SerializeField] private List<SpriteSet> animations;
