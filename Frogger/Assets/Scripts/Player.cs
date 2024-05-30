@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Color = UnityEngine.Color;
 
 
 public class Player : MonoBehaviour
@@ -209,25 +211,35 @@ public class Player : MonoBehaviour
     {
         var leftWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.left);
         if (leftWall && !_isTouchingLeftWall)
-            StickToWall(-90f);
+        {
+            var hit = _raySensor.CastAllHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.left);
+            StickToWall(-90f, hit.point);
+        }
         _isTouchingLeftWall = leftWall;
         var rightWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.right);
         if (rightWall && !_isTouchingRightWall)
-            StickToWall(90f);
+        {
+            var hit = _raySensor.CastAllHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.right);
+            StickToWall(90f, hit.point);
+        }
         _isTouchingRightWall = rightWall;
         var upWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.up);
         if (upWall && !_isTouchingUpWall)
-            StickToWall(180f);
+        {
+            var hit = _raySensor.CastAllHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.up);
+            StickToWall(180f, hit.point);
+        }
         _isTouchingUpWall = upWall;
     }
 
-    private void StickToWall(float surfaceAngle)
+    private void StickToWall(float surfaceAngle, Vector2 snapPoint)
     {
         if(_isSticking)
             return;
         _spriteAnimator.SwitchAnimation("Land");
         _rb.gravityScale = 0;
         visual.rotation = Quaternion.Euler(new Vector3(0f, 0f, surfaceAngle));
+        transform.position = snapPoint;
         _rb.velocity = Vector2.zero;
         _stickingSurfaceAngle = surfaceAngle;
         _isSticking = true;

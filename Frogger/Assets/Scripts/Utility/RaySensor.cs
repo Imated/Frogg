@@ -2,6 +2,14 @@ using UnityEngine;
 
 public class RaySensor : MonoBehaviour
 {
+    public RaycastHit2D CastAllHit(float rayLength, float rayYOffset, float rayXOffset, LayerMask hitMask, Vector3 dir)
+    {
+        var position = new Vector3(transform.position.x + rayXOffset, transform.position.y, transform.position.z);
+        var origin = position + dir * rayYOffset;
+        var hit = Physics2D.Raycast(origin, dir * rayLength, rayLength, hitMask);
+        return hit;
+    }
+    
     public bool CastAll(float rayLength, float rayYOffset, float rayXOffset, float raySideOffset, LayerMask hitMask, Vector3 dir)
     {
         var position = new Vector3(transform.position.x + rayXOffset, transform.position.y, transform.position.z);
