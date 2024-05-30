@@ -193,7 +193,7 @@ TilemapCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 981e5a00a4ca40b468135cf794a9480f, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -262,8 +262,8 @@ TilemapRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1190893873
-  m_SortingLayer: 2
+  m_SortingLayerID: -1095696995
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0.5625, y: 0.5625, z: 0}
@@ -1703,8 +1703,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1036145605
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: -7031428504891916821, guid: 4ad6c9b628fa94f4b9da7f09c1d9d518, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
