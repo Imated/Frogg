@@ -1,8 +1,12 @@
 using System.Collections.Generic;
 using System.Drawing;
+using DG.Tweening;
+using Unity.Mathematics.Geometry;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using Color = UnityEngine.Color;
+using Math = System.Math;
 
 
 public class Player : MonoBehaviour
@@ -13,12 +17,14 @@ public class Player : MonoBehaviour
     [SerializeField] private float moveSpeedMax = 20f;
     [SerializeField] private float timeUntilMax = 1f;
     [SerializeField] private Transform visual;
+    [FormerlySerializedAs("targetSwingObjects")]
     [Header("Swinging")]
-    [SerializeField] private List<GameObject> targetSwingObjects;
+    [SerializeField] private GameObject targetSwingObject;
     [SerializeField] private Transform swingPoint;
     [SerializeField] private float radius;
     [SerializeField] private float swingSpeedMult = 1.0005f;
     [SerializeField] private LineRenderer swingLine;
+    [SerializeField] private float tongueLength = 10f;
     [Header("Ground Check")]
     [SerializeField] private LayerMask groundLayerMask;
     [Range(0.1f, 5.0f), SerializeField] private float groundRayLength = 0.25f;
@@ -105,52 +111,75 @@ public class Player : MonoBehaviour
 
     private void UpdateSwinging()
     {
-        for (int i = 0; i < targetSwingObjects.Count; i++)
-        {
-            if (Vector2.Distance(targetSwingObjects[i].transform.position, transform.position) <= 20f)
-            {
-                _currentlyActiveSwingPoint = i;
-                break;
-            }
-        }
-        
-        _canSwing = InRange(targetSwingObjects[_currentlyActiveSwingPoint].transform.position);
-        
-        if(Input.GetMouseButtonDown(0) && _canSwing)
+        _canSwing = CanSwing();
+
+        if (Input.GetMouseButtonDown(0))
             StartSwing();
         
-        if(Input.GetMouseButton(0) && _canSwing)
+        if(Input.GetMouseButton(0))
             Swing();
         
         if(Input.GetMouseButtonUp(0) && _isSwinging)
             StopSwing();
+        
+        if(_isSwinging)
+            swingLine.SetPosition(0, swingPoint.position);
     }
     
     private void StartSwing()
     {
-        _isSwinging = true; 
-        swingLine.enabled = true;
-        _distanceJoint.enabled = true;
-        _rb.drag = 0.25f;
+        var swingPointInfo = GetSwingPointInfo();
+        swingLine.SetPosition(0, swingPoint.position);
         swingLine.SetPosition(1, swingPoint.position);
-        swingLine.DoSetPosition(1, targetSwingObjects[_currentlyActiveSwingPoint].transform.position, 0.2f);
-        Invoke(nameof(StopSwing), 5f);
+        if (_canSwing)
+        {
+            targetSwingObject.transform.position = swingPointInfo.Item2;
+            _distanceJoint.enabled = true;
+            _rb.drag = 0.25f;
+            Invoke(nameof(StopSwing), 5f);
+        }
+        else
+            targetSwingObject.transform.position = transform.position + swingPointInfo.Item1 * tongueLength;
+
+        swingLine.DoSetPosition(1, targetSwingObject.transform.position, 0.3f);
+        swingLine.enabled = true;
+        _isSwinging = true; 
     }
     
     private void Swing()
     {
+        swingLine.enabled = true;
         _rb.velocity *= swingSpeedMult;
         swingLine.SetPosition(0, swingPoint.position);
-        
     }
     
     private void StopSwing()
     {
         CancelInvoke(nameof(StopSwing));
-        _isSwinging = false;
-        swingLine.enabled = false;
+        swingLine.DOKill();
+        swingLine.DoSetPosition(1, swingPoint.position, 0.3f).OnComplete(() =>
+        {
+            swingLine.enabled = false;
+            _isSwinging = false;
+        });
         _distanceJoint.enabled = false;
         _rb.drag = 0;
+    }
+    
+    private bool CanSwing()
+    {
+        var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition).IgnoreZ();
+        var direction = (pos - transform.position).normalized;
+        var hit = _raySensor.CastHit(tongueLength, 0f, 0f, groundLayerMask, direction);
+        return hit.collider != null;
+    }
+
+    private (Vector3, Vector3) GetSwingPointInfo()
+    {
+        var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition).IgnoreZ();
+        var direction = (pos - transform.position).normalized;
+        var hit = _raySensor.CastHit(tongueLength, 0f, 0f, groundLayerMask, direction);
+        return (direction, hit.point);
     }
 
     #endregion
@@ -212,21 +241,21 @@ public class Player : MonoBehaviour
         var leftWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.left);
         if (leftWall && !_isTouchingLeftWall)
         {
-            var hit = _raySensor.CastAllHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.left);
+            var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.left);
             StickToWall(-90f, hit.point);
         }
         _isTouchingLeftWall = leftWall;
         var rightWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.right);
         if (rightWall && !_isTouchingRightWall)
         {
-            var hit = _raySensor.CastAllHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.right);
+            var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.right);
             StickToWall(90f, hit.point);
         }
         _isTouchingRightWall = rightWall;
         var upWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.up);
         if (upWall && !_isTouchingUpWall)
         {
-            var hit = _raySensor.CastAllHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.up);
+            var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.up);
             StickToWall(180f, hit.point);
         }
         _isTouchingUpWall = upWall;
@@ -250,11 +279,6 @@ public class Player : MonoBehaviour
         _rb.gravityScale = 1;
         visual.rotation = Quaternion.Euler(Vector3.zero);
         _isSticking = false;
-    }
-    
-    private bool InRange(Vector2 target)
-    {
-        return radius >= Vector2.Distance(transform.position, target) || _isSwinging;
     }
     
     private void OnDrawGizmos() 

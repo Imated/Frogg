@@ -1535,7 +1535,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: -4, z: 0}
-  m_LocalScale: {x: 1.5, y: 20, z: 1.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1711,12 +1711,12 @@ MonoBehaviour:
   moveSpeedMax: 6
   timeUntilMax: 0.65
   visual: {fileID: 1507480288}
-  targetSwingObjects:
-  - {fileID: 1100923050}
+  targetSwingObject: {fileID: 1100923050}
   swingPoint: {fileID: 85001707}
   radius: 15
   swingSpeedMult: 1.0005
   swingLine: {fileID: 1835938774}
+  tongueLength: 20
   groundLayerMask:
     serializedVersion: 2
     m_Bits: 64
