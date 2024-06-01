@@ -1,6 +1,9 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 using Color = UnityEngine.Color;
 
 
@@ -13,6 +16,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float moveSpeedMax = 20f;
     [SerializeField] private float timeUntilMax = 1f;
     [SerializeField] private Transform visual;
+    [SerializeField] private Slider sensSlider;
     [FormerlySerializedAs("targetSwingObjects")]
     [Header("Swinging")]
     [SerializeField] private GameObject targetSwingObject;
@@ -69,6 +73,12 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        sensitivity = sensSlider.value;
+        EventSystem.current.SetSelectedGameObject(null);
+
+        if (Keyboard.current.rKey.wasPressedThisFrame)
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        
         GroundCheck();
         WallCheck();
         
