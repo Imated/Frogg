@@ -22,6 +22,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float timeUntilMax = 1f;
     [SerializeField] private Transform visual;
     [SerializeField] private Slider sensSlider;
+    [SerializeField] private LayerMask slipperyLayerMask;
     [Header("Controller Settings")]
     [SerializeField, Range(0.001f, 0.1f)] private float sensitivity;
     [SerializeField, Range(0f, 1f)] private float deadzone = 0.4f;
@@ -314,31 +315,35 @@ public class Player : MonoBehaviour
         if (leftWall && !_isTouchingLeftWall)
         {
             var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.left);
-            StickToWall(-90f, hit.point);
+            var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.left);
+            StickToWall(-90f, hit.point, slipperyHit.collider != null);
         }
         _isTouchingLeftWall = leftWall;
         var rightWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.right);
         if (rightWall && !_isTouchingRightWall)
         {
             var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.right);
-            StickToWall(90f, hit.point);
+            var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.right);
+            StickToWall(90f, hit.point, slipperyHit.collider != null);
         }
         _isTouchingRightWall = rightWall;
         var upWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.up);
         if (upWall && !_isTouchingUpWall)
         {
             var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.up);
-            StickToWall(180f, hit.point);
+            var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.up);
+            StickToWall(180f, hit.point, slipperyHit.collider != null);
         }
         _isTouchingUpWall = upWall;
     }
 
-    private void StickToWall(float surfaceAngle, Vector2 snapPoint)
+    private void StickToWall(float surfaceAngle, Vector2 snapPoint, bool slippery)
     {
         if(_isSticking)
             return;
         _spriteAnimator.SwitchAnimation("Land");
-        _rb.gravityScale = 0;
+        if(!slippery)
+            _rb.gravityScale = 0;
         visual.rotation = Quaternion.Euler(new Vector3(0f, 0f, surfaceAngle));
         transform.position = snapPoint;
         _rb.velocity = Vector2.zero;
