@@ -35,7 +35,7 @@ public class RaySensor : MonoBehaviour
         var hitLeft = Physics2D.Raycast(originLeft, dir * rayLength, rayLength, hitMask);
         var hitRight = Physics2D.Raycast(originRight, dir * rayLength, rayLength, hitMask);
 
-        return hit && hitLeft && hitRight;
+        return hit || hitLeft || hitRight;
     }
     
     public bool Cast(float rayLength, float rayYOffset, float rayXOffset, float raySideOffset, LayerMask hitMask, Vector3 dir)
