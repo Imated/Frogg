@@ -479,7 +479,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -2187,6 +2187,8 @@ MonoBehaviour:
   timeUntilMax: 0.65
   visual: {fileID: 1507480288}
   sensSlider: {fileID: 436572529}
+  sensitivity: 0.005
+  deadzone: 0.4
   targetSwingObject: {fileID: 1100923050}
   swingPoint: {fileID: 85001707}
   radius: 15
@@ -2194,7 +2196,6 @@ MonoBehaviour:
   swingLine: {fileID: 1835938774}
   tongueLength: 20
   dot: {fileID: 277621272}
-  sensitivity: 0.1
   groundLayerMask:
     serializedVersion: 2
     m_Bits: 64

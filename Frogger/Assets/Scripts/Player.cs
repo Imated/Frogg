@@ -1,3 +1,4 @@
+using System.Numerics;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -5,6 +6,9 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Color = UnityEngine.Color;
+using Quaternion = UnityEngine.Quaternion;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 
 public class Player : MonoBehaviour
@@ -17,7 +21,9 @@ public class Player : MonoBehaviour
     [SerializeField] private float timeUntilMax = 1f;
     [SerializeField] private Transform visual;
     [SerializeField] private Slider sensSlider;
-    [FormerlySerializedAs("targetSwingObjects")]
+    [Header("Controller Settings")]
+    [SerializeField, Range(0.001f, 0.1f)] private float sensitivity;
+    [SerializeField, Range(0f, 1f)] private float deadzone = 0.4f;
     [Header("Swinging")]
     [SerializeField] private GameObject targetSwingObject;
     [SerializeField] private Transform swingPoint;
@@ -26,7 +32,6 @@ public class Player : MonoBehaviour
     [SerializeField] private LineRenderer swingLine;
     [SerializeField] private float tongueLength = 10f;
     [SerializeField] private Transform dot;
-    [SerializeField] private float sensitivity;
     [Header("Ground Check")]
     [SerializeField] private LayerMask groundLayerMask;
     [Range(0.1f, 5.0f), SerializeField] private float groundRayLength = 0.25f;
@@ -93,12 +98,12 @@ public class Player : MonoBehaviour
             {
                 if (Gamepad.current.leftStick.value.x != 0)
                 {
-                    if (Gamepad.current.leftStick.value.x < -0.4f)
+                    if (Gamepad.current.leftStick.value.x < -deadzone)
                     {
                         _spriteAnimator.FlipX(!_isUpsideDown);
                         _direction = -1;
                     }
-                    else if (Gamepad.current.leftStick.value.x > 0.4f)
+                    else if (Gamepad.current.leftStick.value.x > deadzone)
                     {
                         _spriteAnimator.FlipX(_isUpsideDown);
                         _direction = 1;
