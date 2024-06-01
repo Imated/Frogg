@@ -1,4 +1,5 @@
 using System.Numerics;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -64,6 +65,7 @@ public class Player : MonoBehaviour
     private float _stickingSurfaceAngle;
     private bool _isUpsideDown;
     private Vector2 _swingDirection;
+    private bool _falseSwing;
 
     private void Awake()
     {
@@ -148,6 +150,8 @@ public class Player : MonoBehaviour
 
     private void OnSwing(bool startedSwinging)
     {
+        if(_falseSwing)
+            return;
         if(startedSwinging)
             StartSwing();
         else
@@ -157,6 +161,7 @@ public class Player : MonoBehaviour
     private void UpdateSwinging()
     {
         _canSwing = CanSwing();
+        _falseSwing = _isSwinging && !_distanceJoint.enabled;
         if (useController)
         {
             var horizontal = Gamepad.current.leftStick.x.ReadValue();
@@ -167,7 +172,7 @@ public class Player : MonoBehaviour
         else
         {
             var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition).IgnoreZ();
-            _swingDirection = (pos - transform.position).normalized * sensitivity;
+            _swingDirection = (pos - transform.position).normalized;
         }
         
         if(_isSwinging)
@@ -197,11 +202,20 @@ public class Player : MonoBehaviour
             _distanceJoint.enabled = true;
             _rb.drag = 0.25f;
             Invoke(nameof(StopSwing), 5f);
+            swingLine.DoSetPosition(1, targetSwingObject.transform.position, 0.3f);
         }
         else
+        {
             targetSwingObject.transform.position = transform.position + swingPointInfo.Item1 * tongueLength;
-
-        swingLine.SetPosition(1, targetSwingObject.transform.position);
+            swingLine.DoSetPosition(1, targetSwingObject.transform.position, 0.3f).OnComplete(() =>
+            {
+                swingLine.DoSetPosition(1, swingPoint.position, 0.3f).OnComplete(() =>
+                {
+                    _isSwinging = false;
+                    swingLine.enabled = false;
+                });
+            });
+        }
         swingLine.enabled = true;
         _isSwinging = true; 
     }
@@ -216,8 +230,13 @@ public class Player : MonoBehaviour
     private void StopSwing()
     {
         CancelInvoke(nameof(StopSwing));
-        swingLine.SetPosition(1, swingPoint.position);
-        swingLine.enabled = false;
+        swingLine.DoSetPosition(1, swingPoint.position, 0.3f).OnUpdate(() =>
+        {
+            
+        }).OnComplete(() =>
+        {
+            swingLine.enabled = false;
+        });
         _isSwinging = false;
         _distanceJoint.enabled = false;
         _rb.drag = 0;
