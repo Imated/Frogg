@@ -1,16 +1,12 @@
-using System.Collections.Generic;
-using System.Drawing;
-using DG.Tweening;
-using Unity.Mathematics.Geometry;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 using Color = UnityEngine.Color;
-using Math = System.Math;
 
 
 public class Player : MonoBehaviour
 {
+    [SerializeField] private bool useController = false;
     [SerializeField] private float jumpHeightMin = 7.5f;
     [SerializeField] private float jumpHeightMax = 20f;    
     [SerializeField] private float moveSpeedMin = 7.5f;
@@ -25,6 +21,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float swingSpeedMult = 1.0005f;
     [SerializeField] private LineRenderer swingLine;
     [SerializeField] private float tongueLength = 10f;
+    [SerializeField] private Transform dot;
+    [SerializeField] private float sensitivity;
     [Header("Ground Check")]
     [SerializeField] private LayerMask groundLayerMask;
     [Range(0.1f, 5.0f), SerializeField] private float groundRayLength = 0.25f;
@@ -56,6 +54,7 @@ public class Player : MonoBehaviour
     private bool _isSticking;
     private float _stickingSurfaceAngle;
     private bool _isUpsideDown;
+    private Vector2 _swingDirection;
 
     private void Awake()
     {
@@ -65,6 +64,7 @@ public class Player : MonoBehaviour
         _raySensor = GetComponent<RaySensor>();
         _rb = GetComponent<Rigidbody2D>();
         _inputManager.OnJump += OnJump;
+        _inputManager.OnSwing += OnSwing;
     }
 
     private void Update()
@@ -77,15 +77,37 @@ public class Player : MonoBehaviour
 
         _isUpsideDown = _isSticking && Mathf.Abs(_stickingSurfaceAngle) > 90f;
 
-        if ((!_isSticking || _isUpsideDown) && Camera.main.ScreenToWorldPoint(Mouse.current.position.value).x < transform.position.x)
+        if (!_isSticking || _isUpsideDown)
         {
-            _spriteAnimator.FlipX(!_isUpsideDown);
-            _direction = -1;
-        }
-        else if((!_isSticking || _isUpsideDown) && Camera.main.ScreenToWorldPoint(Mouse.current.position.value).x >= transform.position.x)
-        {
-            _spriteAnimator.FlipX(_isUpsideDown);
-            _direction = 1;
+            if (useController)
+            {
+                if (Gamepad.current.leftStick.value.x != 0)
+                {
+                    if (Gamepad.current.leftStick.value.x < -0.4f)
+                    {
+                        _spriteAnimator.FlipX(!_isUpsideDown);
+                        _direction = -1;
+                    }
+                    else if (Gamepad.current.leftStick.value.x > 0.4f)
+                    {
+                        _spriteAnimator.FlipX(_isUpsideDown);
+                        _direction = 1;
+                    }
+                }
+            }
+            else
+            {
+                if (Camera.main.ScreenToWorldPoint(Mouse.current.position.value).x < transform.position.x)
+                {
+                    _spriteAnimator.FlipX(!_isUpsideDown);
+                    _direction = -1;
+                }
+                else
+                {
+                    _spriteAnimator.FlipX(_isUpsideDown);
+                    _direction = 1;
+                }
+            }
         }
         else if (_isSticking && !(Mathf.Abs(_stickingSurfaceAngle) < 90f))
         {
@@ -109,21 +131,44 @@ public class Player : MonoBehaviour
     
     #region Swing
 
+    private void OnSwing(bool startedSwinging)
+    {
+        if(startedSwinging)
+            StartSwing();
+        else
+            StopSwing();
+    }
+    
     private void UpdateSwinging()
     {
         _canSwing = CanSwing();
-
-        if (Input.GetMouseButtonDown(0))
-            StartSwing();
-        
-        if(Input.GetMouseButton(0))
-            Swing();
-        
-        if(Input.GetMouseButtonUp(0) && _isSwinging)
-            StopSwing();
+        if (useController)
+        {
+            var horizontal = Gamepad.current.leftStick.x.ReadValue();
+            var vertical = Gamepad.current.leftStick.y.ReadValue();
+            var newDirection = new Vector2(horizontal, vertical);
+            _swingDirection = Vector2.Lerp(_swingDirection, newDirection, sensitivity).normalized;
+        }
+        else
+        {
+            var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition).IgnoreZ();
+            _swingDirection = (pos - transform.position).normalized * sensitivity;
+        }
         
         if(_isSwinging)
-            swingLine.SetPosition(0, swingPoint.position);
+            Swing();
+        if (useController)
+        {
+            dot.gameObject.SetActive(true);
+            
+            var hit = _raySensor.CastHit(tongueLength, 0f, 0f, groundLayerMask, _swingDirection);
+            if(_canSwing)
+                dot.position = hit.point;
+            else
+                dot.position = transform.position + (Vector3) _swingDirection * tongueLength;
+        }
+        else
+            dot.gameObject.SetActive(false);
     }
     
     private void StartSwing()
@@ -141,7 +186,7 @@ public class Player : MonoBehaviour
         else
             targetSwingObject.transform.position = transform.position + swingPointInfo.Item1 * tongueLength;
 
-        swingLine.DoSetPosition(1, targetSwingObject.transform.position, 0.3f);
+        swingLine.SetPosition(1, targetSwingObject.transform.position);
         swingLine.enabled = true;
         _isSwinging = true; 
     }
@@ -156,30 +201,23 @@ public class Player : MonoBehaviour
     private void StopSwing()
     {
         CancelInvoke(nameof(StopSwing));
-        swingLine.DOKill();
-        swingLine.DoSetPosition(1, swingPoint.position, 0.3f).OnComplete(() =>
-        {
-            swingLine.enabled = false;
-            _isSwinging = false;
-        });
+        swingLine.SetPosition(1, swingPoint.position);
+        swingLine.enabled = false;
+        _isSwinging = false;
         _distanceJoint.enabled = false;
         _rb.drag = 0;
     }
     
     private bool CanSwing()
     {
-        var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition).IgnoreZ();
-        var direction = (pos - transform.position).normalized;
-        var hit = _raySensor.CastHit(tongueLength, 0f, 0f, groundLayerMask, direction);
+        var hit = _raySensor.CastHit(tongueLength, 0f, 0f, groundLayerMask, _swingDirection);
         return hit.collider != null;
     }
 
     private (Vector3, Vector3) GetSwingPointInfo()
     {
-        var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition).IgnoreZ();
-        var direction = (pos - transform.position).normalized;
-        var hit = _raySensor.CastHit(tongueLength, 0f, 0f, groundLayerMask, direction);
-        return (direction, hit.point);
+        var hit = _raySensor.CastHit(tongueLength, 0f, 0f, groundLayerMask, _swingDirection);
+        return (_swingDirection, hit.point);
     }
 
     #endregion
@@ -290,5 +328,10 @@ public class Player : MonoBehaviour
         _raySensor.CastGizmos(Color.red, wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, Vector3.right);
         _raySensor.CastGizmos(Color.red, wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, Vector3.left);
         _raySensor.CastGizmos(Color.red, wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, Vector3.up);
+        var hit = _raySensor.CastHit(tongueLength, 0f, 0f, groundLayerMask, _swingDirection);
+        if(CanSwing())
+            _raySensor.CastGizmo(Color.green, hit.distance, 0f, 0f, _swingDirection);
+        else
+            _raySensor.CastGizmo(Color.green, tongueLength, 0f, 0f, _swingDirection);
     }
 }

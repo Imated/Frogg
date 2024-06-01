@@ -92,4 +92,12 @@ public class RaySensor : MonoBehaviour
         Gizmos.DrawLine(originLeft, originLeft + dir * rayLength);
         Gizmos.DrawLine(originRight, originRight + dir * rayLength);
     }
+    
+    public void CastGizmo(Color color, float rayLength, float rayYOffset, float rayXOffset, Vector3 dir)
+    {
+        var position = new Vector3(transform.position.x + rayXOffset, transform.position.y, transform.position.z);
+        var origin = position + dir * rayYOffset;
+        Gizmos.color = color;
+        Gizmos.DrawLine(origin, origin + dir * rayLength);
+    }
 }
