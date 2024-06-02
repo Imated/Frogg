@@ -211,6 +211,7 @@ public class Player : MonoBehaviour
         else
         {
             targetSwingObject.transform.position = transform.position + swingPointInfo.Item1 * tongueLength;
+            _isSwinging = true; 
             swingLine.DoSetPosition(1, targetSwingObject.transform.position, 0.3f).OnComplete(() =>
             {
                 swingLine.DoSetPosition(1, swingPoint.position, 0.3f).OnComplete(() =>
@@ -219,7 +220,6 @@ public class Player : MonoBehaviour
                     swingLine.enabled = false;
                 });
             });
-            _isSwinging = true; 
         }
         swingLine.enabled = true;
     }
@@ -240,6 +240,7 @@ public class Player : MonoBehaviour
         }).OnComplete(() =>
         {
             swingLine.enabled = false;
+            _isSwinging = false;
         });
         _isSwinging = false;
         _distanceJoint.enabled = false;
