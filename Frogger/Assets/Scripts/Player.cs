@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using DG.Tweening;
 using UnityEngine;
@@ -68,8 +69,7 @@ public class Player : MonoBehaviour
     private Vector2 _swingDirection;
     private bool _falseSwing;
     private bool _isOnSlippery;
-    private bool _hasQueuedStopSwing;
-    private bool _startSwingComplete;
+    private bool _isTongueOut;
 
     private void Awake()
     {
@@ -197,6 +197,8 @@ public class Player : MonoBehaviour
     
     private void StartSwing()
     {
+        if(_isTongueOut || _isSwinging)
+            return;
         var swingPointInfo = GetSwingPointInfo();
         swingLine.SetPosition(0, swingPoint.position);
         swingLine.SetPosition(1, swingPoint.position);
@@ -204,43 +206,19 @@ public class Player : MonoBehaviour
         {
             targetSwingObject.transform.position = swingPointInfo.Item2;
             _distanceJoint.enabled = true;
-            _isSwinging = true;
             _rb.drag = 0.25f;
             Invoke(nameof(StopSwing), 5f);
-            swingLine.DoSetPosition(1, targetSwingObject.transform.position, 0.3f).OnComplete(() =>
-            {
-                _startSwingComplete = true;
-                if (_hasQueuedStopSwing)
-                {
-                    _startSwingComplete = false;
-                    _hasQueuedStopSwing = false;
-                    swingLine.DoSetPosition(1, swingPoint.position, 0.3f).OnComplete(() =>
-                    {
-                        swingLine.enabled = false;
-                        _isSwinging = false;
-                    });
-                }
-            });
+            ExtendTongue(targetSwingObject.transform.position);
         }
         else
         {
             targetSwingObject.transform.position = transform.position + swingPointInfo.Item1 * tongueLength;
-            _isSwinging = true; 
-            swingLine.DoSetPosition(1, targetSwingObject.transform.position, 0.3f).OnComplete(() =>
-            {
-                swingLine.DoSetPosition(1, swingPoint.position, 0.3f).OnComplete(() =>
-                {
-                    _isSwinging = false;
-                    swingLine.enabled = false;
-                });
-            });
+            ExtendTongue(targetSwingObject.transform.position, () => { RetractTongue(); });
         }
-        swingLine.enabled = true;
     }
     
     private void Swing()
     {
-        swingLine.enabled = true;
         _rb.velocity *= swingSpeedMult;
         swingLine.SetPosition(0, swingPoint.position);
     }
@@ -248,21 +226,30 @@ public class Player : MonoBehaviour
     private void StopSwing()
     {
         CancelInvoke(nameof(StopSwing));
-        if(!_startSwingComplete) 
-            _hasQueuedStopSwing = true;
-        else
-        {
-            _startSwingComplete = false;
-            swingLine.DoSetPosition(1, swingPoint.position, 0.3f).OnComplete(() =>
-            {
-                swingLine.enabled = false;
-                _isSwinging = false;
-            });
-        }
-
-        _isSwinging = false;
+        RetractTongue();
         _distanceJoint.enabled = false;
         _rb.drag = 0;
+    }
+
+    private void ExtendTongue(Vector3 to, TweenCallback onComplete = null)
+    {
+        swingLine.DOKill();
+        swingLine.enabled = true;
+        _isSwinging = true;
+        _isTongueOut = true;
+        swingLine.DoSetPosition(1, to, 0.3f).OnComplete(onComplete);
+    }
+
+    private void RetractTongue(TweenCallback onComplete = null)
+    {
+        swingLine.DOKill();
+        swingLine.DoSetPosition(1, swingPoint.position, 0.3f).OnComplete(() =>
+        {
+            swingLine.enabled = false;
+            _isSwinging = false;
+            _isTongueOut = false;
+            onComplete?.Invoke();
+        });
     }
     
     private bool CanSwing()
