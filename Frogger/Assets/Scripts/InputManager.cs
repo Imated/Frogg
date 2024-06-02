@@ -23,8 +23,8 @@ public class InputManager : MonoBehaviour
     {
         _player.Player.Jump.performed -= ctx => OnJump?.Invoke(true);
         _player.Player.Jump.canceled -= ctx => OnJump?.Invoke(false); 
-        _player.Player.Swing.performed += ctx => OnSwing?.Invoke(true);
-        _player.Player.Swing.canceled += ctx => OnSwing?.Invoke(false);
+        _player.Player.Swing.performed -= ctx => OnSwing?.Invoke(true);
+        _player.Player.Swing.canceled -= ctx => OnSwing?.Invoke(false);
         _player.Disable();
     }
 }

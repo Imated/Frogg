@@ -342,6 +342,8 @@ public class Player : MonoBehaviour
 
     private void StickToWall(float surfaceAngle, Vector2 snapPoint, bool slippery)
     {
+        if(_falseSwing)
+            StopSwing();
         if(_isSticking)
             return;
         _spriteAnimator.SwitchAnimation("Land");
