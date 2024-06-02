@@ -67,6 +67,9 @@ public class Player : MonoBehaviour
     private bool _isUpsideDown;
     private Vector2 _swingDirection;
     private bool _falseSwing;
+    private bool _isOnSlippery;
+    private bool _hasQueuedStopSwing;
+    private bool _startSwingComplete;
 
     private void Awake()
     {
@@ -201,11 +204,22 @@ public class Player : MonoBehaviour
         {
             targetSwingObject.transform.position = swingPointInfo.Item2;
             _distanceJoint.enabled = true;
+            _isSwinging = true;
             _rb.drag = 0.25f;
             Invoke(nameof(StopSwing), 5f);
             swingLine.DoSetPosition(1, targetSwingObject.transform.position, 0.3f).OnComplete(() =>
             {
-                _isSwinging = true; 
+                _startSwingComplete = true;
+                if (_hasQueuedStopSwing)
+                {
+                    _startSwingComplete = false;
+                    _hasQueuedStopSwing = false;
+                    swingLine.DoSetPosition(1, swingPoint.position, 0.3f).OnComplete(() =>
+                    {
+                        swingLine.enabled = false;
+                        _isSwinging = false;
+                    });
+                }
             });
         }
         else
@@ -234,14 +248,18 @@ public class Player : MonoBehaviour
     private void StopSwing()
     {
         CancelInvoke(nameof(StopSwing));
-        swingLine.DoSetPosition(1, swingPoint.position, 0.3f).OnUpdate(() =>
+        if(!_startSwingComplete) 
+            _hasQueuedStopSwing = true;
+        else
         {
-            
-        }).OnComplete(() =>
-        {
-            swingLine.enabled = false;
-            _isSwinging = false;
-        });
+            _startSwingComplete = false;
+            swingLine.DoSetPosition(1, swingPoint.position, 0.3f).OnComplete(() =>
+            {
+                swingLine.enabled = false;
+                _isSwinging = false;
+            });
+        }
+
         _isSwinging = false;
         _distanceJoint.enabled = false;
         _rb.drag = 0;
@@ -320,6 +338,7 @@ public class Player : MonoBehaviour
         {
             var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.left);
             var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.left);
+            _isOnSlippery = slipperyHit.collider != null;
             StickToWall(-90f, hit.point, slipperyHit.collider != null);
         }
         _isTouchingLeftWall = leftWall;
@@ -328,6 +347,7 @@ public class Player : MonoBehaviour
         {
             var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.right);
             var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.right);
+            _isOnSlippery = slipperyHit.collider != null;
             StickToWall(90f, hit.point, slipperyHit.collider != null);
         }
         _isTouchingRightWall = rightWall;
@@ -336,6 +356,7 @@ public class Player : MonoBehaviour
         {
             var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.up);
             var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.up);
+            _isOnSlippery = slipperyHit.collider != null;
             StickToWall(180f, hit.point, slipperyHit.collider != null);
         }
         _isTouchingUpWall = upWall;

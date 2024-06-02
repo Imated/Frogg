@@ -7,9 +7,9 @@ public static class DoTweenExtensions
 {
     public static Tweener DoSetPosition(this LineRenderer target, int index, Vector3 endValue, float duration)
     {
-        return DOTween.To((DOGetter<Vector3>) (() => target.GetPosition(index)), (DOSetter<Vector3>) (x =>
+        return DOTween.To(() => target.GetPosition(index), x =>
         {
             target.SetPosition(index, x);
-        }), endValue, duration).SetTarget(target);
+        }, endValue, duration).SetTarget(target);
     }
 }
