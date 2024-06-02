@@ -151,7 +151,7 @@ public class Player : MonoBehaviour
 
     private void OnSwing(bool startedSwinging)
     {
-        if(_falseSwing)
+        if(_falseSwing || _isCharging)
             return;
         if(startedSwinging)
             StartSwing();
