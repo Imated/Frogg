@@ -203,7 +203,10 @@ public class Player : MonoBehaviour
             _distanceJoint.enabled = true;
             _rb.drag = 0.25f;
             Invoke(nameof(StopSwing), 5f);
-            swingLine.DoSetPosition(1, targetSwingObject.transform.position, 0.3f);
+            swingLine.DoSetPosition(1, targetSwingObject.transform.position, 0.3f).OnComplete(() =>
+            {
+                _isSwinging = true; 
+            });
         }
         else
         {
@@ -216,9 +219,9 @@ public class Player : MonoBehaviour
                     swingLine.enabled = false;
                 });
             });
+            _isSwinging = true; 
         }
         swingLine.enabled = true;
-        _isSwinging = true; 
     }
     
     private void Swing()
