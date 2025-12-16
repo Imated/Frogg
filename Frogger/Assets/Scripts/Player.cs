@@ -29,10 +29,10 @@ public class Player : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float deadzone = 0.4f;
     [Header("Swinging")]
     [SerializeField] private GameObject targetSwingObject;
-    [SerializeField] private Transform swingPoint;
     [SerializeField] private float radius;
     [SerializeField] private float swingSpeedMult = 1.0005f;
-    [SerializeField] private LineRenderer swingLine;
+    [SerializeField] private Transform tongueEnd;
+    [SerializeField] private Transform tongueStart;
     [SerializeField] private float tongueLength = 10f;
     [SerializeField] private Transform dot;
     [Header("Ground Check")]
@@ -53,6 +53,7 @@ public class Player : MonoBehaviour
     private DistanceJoint2D _distanceJoint;
     private RaySensor _raySensor;
     private Rigidbody2D _rb;
+    private Tween _tongueExtendTween;
     private bool _isCharging;
     private float _chargeTime;
     private bool _isGrounded;
@@ -62,7 +63,6 @@ public class Player : MonoBehaviour
     private int _direction = 1;
     private bool _canSwing;
     private int _currentlyActiveSwingPoint;
-    private bool _isSwinging;
     private bool _isSticking;
     private float _stickingSurfaceAngle;
     private bool _isUpsideDown;
@@ -140,13 +140,13 @@ public class Player : MonoBehaviour
 
         if (!_isGrounded && !_isTouchingRightWall && !_isTouchingLeftWall && !_isTouchingUpWall)
             UnStickToWall();
-        if(_spriteAnimator.GetCurrentAnimation() == "Idle" && _isSwinging)
+        if(_spriteAnimator.GetCurrentAnimation() == "Idle" && _isTongueOut)
             _spriteAnimator.SwitchAnimation("Idle Mouth", true);
-        if(_spriteAnimator.GetCurrentAnimation() == "Idle Mouth" && !_isSwinging)
+        if(_spriteAnimator.GetCurrentAnimation() == "Idle Mouth" && !_isTongueOut)
             _spriteAnimator.SwitchAnimation("Idle", true);
-        if(_spriteAnimator.GetCurrentAnimation() == "Jump" && _isSwinging)
+        if(_spriteAnimator.GetCurrentAnimation() == "Jump" && _isTongueOut)
             _spriteAnimator.SwitchAnimation("Jump Mouth", true);
-        if(_spriteAnimator.GetCurrentAnimation() == "Jump Mouth" && !_isSwinging)
+        if(_spriteAnimator.GetCurrentAnimation() == "Jump Mouth" && !_isTongueOut)
             _spriteAnimator.SwitchAnimation("Jump", true);
     }
     
@@ -165,7 +165,7 @@ public class Player : MonoBehaviour
     private void UpdateSwinging()
     {
         _canSwing = CanSwing();
-        _falseSwing = _isSwinging && !_distanceJoint.enabled;
+        _falseSwing = _isTongueOut && !_distanceJoint.enabled;
         if (useController)
         {
             var horizontal = Gamepad.current.leftStick.x.ReadValue();
@@ -179,8 +179,12 @@ public class Player : MonoBehaviour
             _swingDirection = (pos - transform.position).normalized;
         }
         
-        if(_isSwinging)
+        if(_isTongueOut)
             Swing();
+        else
+        {
+            tongueEnd.position = tongueStart.position;
+        }
         if (useController)
         {
             dot.gameObject.SetActive(true);
@@ -197,14 +201,12 @@ public class Player : MonoBehaviour
     
     private void StartSwing()
     {
-        if(_isTongueOut || _isSwinging)
+        if(_isTongueOut || _isTongueOut)
             return;
-        var swingPointInfo = GetSwingPointInfo();
-        swingLine.SetPosition(0, swingPoint.position);
-        swingLine.SetPosition(1, swingPoint.position);
+        var (direction, hit) = GetSwingPointInfo();
         if (_canSwing)
         {
-            targetSwingObject.transform.position = swingPointInfo.Item2;
+            targetSwingObject.transform.position = hit;
             _distanceJoint.enabled = true;
             _rb.drag = 0.25f;
             Invoke(nameof(StopSwing), 5f);
@@ -212,15 +214,17 @@ public class Player : MonoBehaviour
         }
         else
         {
-            targetSwingObject.transform.position = transform.position + swingPointInfo.Item1 * tongueLength;
-            ExtendTongue(targetSwingObject.transform.position, () => { RetractTongue(); });
+            targetSwingObject.transform.position = transform.position + direction * tongueLength;
+            ExtendTongue(targetSwingObject.transform.position, () => RetractTongue());
         }
     }
     
     private void Swing()
     {
         _rb.velocity *= swingSpeedMult;
-        swingLine.SetPosition(0, swingPoint.position);
+        if (!_tongueExtendTween.active)
+            tongueEnd.position = targetSwingObject.transform.position;
+        tongueStart.LookAt(targetSwingObject.transform);
     }
     
     private void StopSwing()
@@ -233,20 +237,14 @@ public class Player : MonoBehaviour
 
     private void ExtendTongue(Vector3 to, TweenCallback onComplete = null)
     {
-        swingLine.DOKill();
-        swingLine.enabled = true;
-        _isSwinging = true;
         _isTongueOut = true;
-        swingLine.DoSetPosition(1, to, 0.3f).OnComplete(onComplete);
+        _tongueExtendTween = tongueEnd.DOMove(to, 0.3f).OnComplete(onComplete);
     }
 
     private void RetractTongue(TweenCallback onComplete = null)
     {
-        swingLine.DOKill();
-        swingLine.DoSetPosition(1, swingPoint.position, 0.3f).OnComplete(() =>
+        tongueEnd.DOMove(tongueStart.position, 0.3f).OnComplete(() =>
         {
-            swingLine.enabled = false;
-            _isSwinging = false;
             _isTongueOut = false;
             onComplete?.Invoke();
         });
@@ -280,7 +278,7 @@ public class Player : MonoBehaviour
     {
         if(!_isGrounded && !_isTouchingRightWall && !_isTouchingLeftWall && !_isTouchingUpWall)
             return;
-        if(_isSwinging)
+        if(_isTongueOut)
             return;
         if(startedJumping)
             StartCharge();
@@ -288,14 +286,14 @@ public class Player : MonoBehaviour
             StopCharge();
     }
 
-    public void StartCharge()
+    private void StartCharge()
     {
         _isCharging = true;
         _chargeTime = 0f;
         _spriteAnimator.SwitchAnimation("Charge");
     }
-    
-    public void StopCharge()
+
+    private void StopCharge()
     {
         if(!_isCharging)
             return;
