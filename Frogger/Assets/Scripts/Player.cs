@@ -96,6 +96,11 @@ public class Player : MonoBehaviour
         UpdateSwinging();
         UpdateCharging();
 
+        if (_isOnSlippery)
+        {
+            _rb.gravityScale = 1.5f;
+        }
+
         _isUpsideDown = _isSticking && Mathf.Abs(_stickingSurfaceAngle) > 90f;
 
         if (!_isSticking || _isUpsideDown)
@@ -130,7 +135,7 @@ public class Player : MonoBehaviour
                 }
             }
         }
-        else if (_isSticking && !(Mathf.Abs(_stickingSurfaceAngle) < 90f))
+        else if (_isSticking && Mathf.Abs(_stickingSurfaceAngle) >= 90f)
         {
             if (_stickingSurfaceAngle < 0)
                 _direction = 1;
@@ -318,44 +323,58 @@ public class Player : MonoBehaviour
 
     private void WallCheck()
     {
+        Debug.Log("Performing Slip check...");
         var leftWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.left);
-        if (leftWall && !_isTouchingLeftWall)
+        if (leftWall)
         {
-            var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.left);
+            if (!_isTouchingLeftWall)
+            {
+                var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.left);
+                StickToWall(-90f, hit.point);
+            }
+            
             var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.left);
-            _isOnSlippery = slipperyHit.collider != null;
-            StickToWall(-90f, hit.point, slipperyHit.collider != null);
+            _isOnSlippery = slipperyHit.transform != null;
         }
         _isTouchingLeftWall = leftWall;
+        
         var rightWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.right);
-        if (rightWall && !_isTouchingRightWall)
+        if (rightWall)
         {
-            var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.right);
+            if (!_isTouchingRightWall)
+            {
+                var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.right);
+                StickToWall(90f, hit.point);
+            }
+            
             var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.right);
-            _isOnSlippery = slipperyHit.collider != null;
-            StickToWall(90f, hit.point, slipperyHit.collider != null);
+            _isOnSlippery = slipperyHit.transform != null;
         }
         _isTouchingRightWall = rightWall;
+        
         var upWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.up);
-        if (upWall && !_isTouchingUpWall)
+        if (upWall)
         {
-            var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.up);
+            if (!_isTouchingUpWall)
+            {
+                var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.up);
+                StickToWall(180f, hit.point);
+            }
+            
             var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.up);
-            _isOnSlippery = slipperyHit.collider != null;
-            StickToWall(180f, hit.point, slipperyHit.collider != null);
+            _isOnSlippery = slipperyHit.transform != null;
         }
         _isTouchingUpWall = upWall;
     }
 
-    private void StickToWall(float surfaceAngle, Vector2 snapPoint, bool slippery)
+    private void StickToWall(float surfaceAngle, Vector2 snapPoint)
     {
         if(_falseSwing)
             StopSwing();
         if(_isSticking)
             return;
         _spriteAnimator.SwitchAnimation("Land");
-        if(!slippery)
-            _rb.gravityScale = 0;
+        _rb.gravityScale = 0;
         visual.rotation = Quaternion.Euler(new Vector3(0f, 0f, surfaceAngle));
         transform.position = snapPoint;
         _rb.velocity = Vector2.zero;
