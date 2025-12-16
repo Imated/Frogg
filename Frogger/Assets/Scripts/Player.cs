@@ -29,10 +29,10 @@ public class Player : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float deadzone = 0.4f;
     [Header("Swinging")]
     [SerializeField] private GameObject targetSwingObject;
-    [SerializeField] private Transform swingPoint;
     [SerializeField] private float radius;
     [SerializeField] private float swingSpeedMult = 1.0005f;
-    [SerializeField] private LineRenderer swingLine;
+    [SerializeField] private Transform tongueEnd;
+    [SerializeField] private Transform tongueStart;
     [SerializeField] private float tongueLength = 10f;
     [SerializeField] private Transform dot;
     [Header("Ground Check")]
@@ -53,6 +53,7 @@ public class Player : MonoBehaviour
     private DistanceJoint2D _distanceJoint;
     private RaySensor _raySensor;
     private Rigidbody2D _rb;
+    private Tween _tongueExtendTween;
     private bool _isCharging;
     private float _chargeTime;
     private bool _isGrounded;
@@ -62,7 +63,6 @@ public class Player : MonoBehaviour
     private int _direction = 1;
     private bool _canSwing;
     private int _currentlyActiveSwingPoint;
-    private bool _isSwinging;
     private bool _isSticking;
     private float _stickingSurfaceAngle;
     private bool _isUpsideDown;
@@ -95,6 +95,11 @@ public class Player : MonoBehaviour
         
         UpdateSwinging();
         UpdateCharging();
+
+        if (_isOnSlippery)
+        {
+            _rb.gravityScale = 1.5f;
+        }
 
         _isUpsideDown = _isSticking && Mathf.Abs(_stickingSurfaceAngle) > 90f;
 
@@ -130,7 +135,7 @@ public class Player : MonoBehaviour
                 }
             }
         }
-        else if (_isSticking && !(Mathf.Abs(_stickingSurfaceAngle) < 90f))
+        else if (_isSticking && Mathf.Abs(_stickingSurfaceAngle) >= 90f)
         {
             if (_stickingSurfaceAngle < 0)
                 _direction = 1;
@@ -140,13 +145,13 @@ public class Player : MonoBehaviour
 
         if (!_isGrounded && !_isTouchingRightWall && !_isTouchingLeftWall && !_isTouchingUpWall)
             UnStickToWall();
-        if(_spriteAnimator.GetCurrentAnimation() == "Idle" && _isSwinging)
+        if(_spriteAnimator.GetCurrentAnimation() == "Idle" && _isTongueOut)
             _spriteAnimator.SwitchAnimation("Idle Mouth", true);
-        if(_spriteAnimator.GetCurrentAnimation() == "Idle Mouth" && !_isSwinging)
+        if(_spriteAnimator.GetCurrentAnimation() == "Idle Mouth" && !_isTongueOut)
             _spriteAnimator.SwitchAnimation("Idle", true);
-        if(_spriteAnimator.GetCurrentAnimation() == "Jump" && _isSwinging)
+        if(_spriteAnimator.GetCurrentAnimation() == "Jump" && _isTongueOut)
             _spriteAnimator.SwitchAnimation("Jump Mouth", true);
-        if(_spriteAnimator.GetCurrentAnimation() == "Jump Mouth" && !_isSwinging)
+        if(_spriteAnimator.GetCurrentAnimation() == "Jump Mouth" && !_isTongueOut)
             _spriteAnimator.SwitchAnimation("Jump", true);
     }
     
@@ -165,7 +170,7 @@ public class Player : MonoBehaviour
     private void UpdateSwinging()
     {
         _canSwing = CanSwing();
-        _falseSwing = _isSwinging && !_distanceJoint.enabled;
+        _falseSwing = _isTongueOut && !_distanceJoint.enabled;
         if (useController)
         {
             var horizontal = Gamepad.current.leftStick.x.ReadValue();
@@ -179,8 +184,12 @@ public class Player : MonoBehaviour
             _swingDirection = (pos - transform.position).normalized;
         }
         
-        if(_isSwinging)
+        if(_isTongueOut)
             Swing();
+        else
+        {
+            tongueEnd.position = tongueStart.position;
+        }
         if (useController)
         {
             dot.gameObject.SetActive(true);
@@ -197,14 +206,12 @@ public class Player : MonoBehaviour
     
     private void StartSwing()
     {
-        if(_isTongueOut || _isSwinging)
+        if(_isTongueOut || _isTongueOut)
             return;
-        var swingPointInfo = GetSwingPointInfo();
-        swingLine.SetPosition(0, swingPoint.position);
-        swingLine.SetPosition(1, swingPoint.position);
+        var (direction, hit) = GetSwingPointInfo();
         if (_canSwing)
         {
-            targetSwingObject.transform.position = swingPointInfo.Item2;
+            targetSwingObject.transform.position = hit;
             _distanceJoint.enabled = true;
             _rb.drag = 0.25f;
             Invoke(nameof(StopSwing), 5f);
@@ -212,15 +219,17 @@ public class Player : MonoBehaviour
         }
         else
         {
-            targetSwingObject.transform.position = transform.position + swingPointInfo.Item1 * tongueLength;
-            ExtendTongue(targetSwingObject.transform.position, () => { RetractTongue(); });
+            targetSwingObject.transform.position = transform.position + direction * tongueLength;
+            ExtendTongue(targetSwingObject.transform.position, () => RetractTongue());
         }
     }
     
     private void Swing()
     {
         _rb.velocity *= swingSpeedMult;
-        swingLine.SetPosition(0, swingPoint.position);
+        if (!_tongueExtendTween.active)
+            tongueEnd.position = targetSwingObject.transform.position;
+        tongueStart.LookAt(targetSwingObject.transform);
     }
     
     private void StopSwing()
@@ -233,20 +242,14 @@ public class Player : MonoBehaviour
 
     private void ExtendTongue(Vector3 to, TweenCallback onComplete = null)
     {
-        swingLine.DOKill();
-        swingLine.enabled = true;
-        _isSwinging = true;
         _isTongueOut = true;
-        swingLine.DoSetPosition(1, to, 0.3f).OnComplete(onComplete);
+        _tongueExtendTween = tongueEnd.DOMove(to, 0.3f).OnComplete(onComplete);
     }
 
     private void RetractTongue(TweenCallback onComplete = null)
     {
-        swingLine.DOKill();
-        swingLine.DoSetPosition(1, swingPoint.position, 0.3f).OnComplete(() =>
+        tongueEnd.DOMove(tongueStart.position, 0.3f).OnComplete(() =>
         {
-            swingLine.enabled = false;
-            _isSwinging = false;
             _isTongueOut = false;
             onComplete?.Invoke();
         });
@@ -280,7 +283,7 @@ public class Player : MonoBehaviour
     {
         if(!_isGrounded && !_isTouchingRightWall && !_isTouchingLeftWall && !_isTouchingUpWall)
             return;
-        if(_isSwinging)
+        if(_isTongueOut)
             return;
         if(startedJumping)
             StartCharge();
@@ -288,14 +291,14 @@ public class Player : MonoBehaviour
             StopCharge();
     }
 
-    public void StartCharge()
+    private void StartCharge()
     {
         _isCharging = true;
         _chargeTime = 0f;
         _spriteAnimator.SwitchAnimation("Charge");
     }
-    
-    public void StopCharge()
+
+    private void StopCharge()
     {
         if(!_isCharging)
             return;
@@ -320,44 +323,58 @@ public class Player : MonoBehaviour
 
     private void WallCheck()
     {
+        Debug.Log("Performing Slip check...");
         var leftWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.left);
-        if (leftWall && !_isTouchingLeftWall)
+        if (leftWall)
         {
-            var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.left);
+            if (!_isTouchingLeftWall)
+            {
+                var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.left);
+                StickToWall(-90f, hit.point);
+            }
+            
             var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.left);
-            _isOnSlippery = slipperyHit.collider != null;
-            StickToWall(-90f, hit.point, slipperyHit.collider != null);
+            _isOnSlippery = slipperyHit.transform != null;
         }
         _isTouchingLeftWall = leftWall;
+        
         var rightWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.right);
-        if (rightWall && !_isTouchingRightWall)
+        if (rightWall)
         {
-            var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.right);
+            if (!_isTouchingRightWall)
+            {
+                var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.right);
+                StickToWall(90f, hit.point);
+            }
+            
             var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.right);
-            _isOnSlippery = slipperyHit.collider != null;
-            StickToWall(90f, hit.point, slipperyHit.collider != null);
+            _isOnSlippery = slipperyHit.transform != null;
         }
         _isTouchingRightWall = rightWall;
+        
         var upWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.up);
-        if (upWall && !_isTouchingUpWall)
+        if (upWall)
         {
-            var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.up);
+            if (!_isTouchingUpWall)
+            {
+                var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.up);
+                StickToWall(180f, hit.point);
+            }
+            
             var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.up);
-            _isOnSlippery = slipperyHit.collider != null;
-            StickToWall(180f, hit.point, slipperyHit.collider != null);
+            _isOnSlippery = slipperyHit.transform != null;
         }
         _isTouchingUpWall = upWall;
     }
 
-    private void StickToWall(float surfaceAngle, Vector2 snapPoint, bool slippery)
+    private void StickToWall(float surfaceAngle, Vector2 snapPoint)
     {
         if(_falseSwing)
             StopSwing();
         if(_isSticking)
             return;
         _spriteAnimator.SwitchAnimation("Land");
-        if(!slippery)
-            _rb.gravityScale = 0;
+        _rb.gravityScale = 0;
         visual.rotation = Quaternion.Euler(new Vector3(0f, 0f, surfaceAngle));
         transform.position = snapPoint;
         _rb.velocity = Vector2.zero;
