@@ -3096,7 +3096,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46edd70e19d37c64c841728e553d42f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useController: 1
+  useController: 0
   jumpHeightMin: 3
   jumpHeightMax: 10
   moveSpeedMin: 2
