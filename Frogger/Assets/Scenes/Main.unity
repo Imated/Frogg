@@ -2394,7 +2394,7 @@ MonoBehaviour:
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 1
-  m_Antialiasing: 2
+  m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
   m_Dithering: 0
@@ -4591,7 +4591,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -16.059372, y: -13.960791}
+  m_Offset: {x: -16.059372, y: -13.786617}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -4601,7 +4601,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 23.102753, y: 3.0507965}
+  m_Size: {x: 23.102753, y: 3.3991432}
   m_EdgeRadius: 0
 --- !u!1 &2028374625
 GameObject:
