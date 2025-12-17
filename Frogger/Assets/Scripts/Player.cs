@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float moveSpeedMin = 7.5f;
     [SerializeField] private float moveSpeedMax = 20f;
     [SerializeField] private float timeUntilMax = 1f;
+    [SerializeField] private float slipSpeed = 7f;
     [SerializeField] private Transform visual;
     [SerializeField] private Slider sensSlider;
     [SerializeField] private LayerMask slipperyLayerMask;
@@ -70,6 +71,7 @@ public class Player : MonoBehaviour
     private bool _falseSwing;
     private bool _isOnSlippery;
     private bool _isTongueOut;
+    private int _startSlipDir;
 
     private void Awake()
     {
@@ -99,6 +101,7 @@ public class Player : MonoBehaviour
         if (_isOnSlippery)
         {
             _rb.gravityScale = 1.5f;
+            _rb.velocityX = slipSpeed * _startSlipDir;
         }
 
         _isUpsideDown = _isSticking && Mathf.Abs(_stickingSurfaceAngle) > 90f;
@@ -316,8 +319,13 @@ public class Player : MonoBehaviour
     private void GroundCheck() 
     {
         var grounded = _raySensor.Cast(groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, groundLayerMask, Vector3.down);
+        var slipperyHit = _raySensor.Cast(groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, slipperyLayerMask, Vector3.down);
         if (grounded && !_isGrounded)
             _spriteAnimator.SwitchAnimation("Land");
+        if (slipperyHit && !_isOnSlippery)
+            _startSlipDir = (int)Mathf.Sign(_rb.velocityX);
+        
+        _isOnSlippery = slipperyHit;
         _isGrounded = grounded;
     }
 
@@ -333,7 +341,7 @@ public class Player : MonoBehaviour
             if (!_isTouchingLeftWall)
             {
                 var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.left);
-                StickToWall(-90f, hit.point, _isOnSlippery);
+                StickToWall(-90f, hit.point);
             }
         }
         _isTouchingLeftWall = leftWall;
@@ -347,7 +355,7 @@ public class Player : MonoBehaviour
             if (!_isTouchingRightWall)
             {
                 var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.right);
-                StickToWall(90f, hit.point, _isOnSlippery);
+                StickToWall(90f, hit.point);
             }
         }
         _isTouchingRightWall = rightWall;
@@ -361,13 +369,13 @@ public class Player : MonoBehaviour
             if (!_isTouchingUpWall)
             {
                 var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.up);
-                StickToWall(180f, hit.point, _isOnSlippery);
+                StickToWall(180f, hit.point);
             }
         }
         _isTouchingUpWall = upWall;
     }
 
-    private void StickToWall(float surfaceAngle, Vector2 snapPoint, bool slippery)
+    private void StickToWall(float surfaceAngle, Vector2 snapPoint)
     {
         if(_falseSwing)
             StopSwing();
@@ -377,8 +385,7 @@ public class Player : MonoBehaviour
         _rb.gravityScale = 0;
         visual.rotation = Quaternion.Euler(new Vector3(0f, 0f, surfaceAngle));
         transform.position = snapPoint;
-        if (!slippery)
-            _rb.velocity = Vector2.zero;
+        _rb.velocity = Vector2.zero;
         _stickingSurfaceAngle = surfaceAngle;
         _isSticking = true;
     }
