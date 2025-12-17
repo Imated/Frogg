@@ -101,7 +101,8 @@ public class Player : MonoBehaviour
         if (_isOnSlippery)
         {
             _rb.gravityScale = 1.5f;
-            _rb.velocityX = slipSpeed * _startSlipDir;
+            if (!_isTouchingRightWall && !_isTouchingLeftWall) 
+                _rb.velocityX = slipSpeed * _startSlipDir;
         }
 
         _isUpsideDown = _isSticking && Mathf.Abs(_stickingSurfaceAngle) > 90f;
