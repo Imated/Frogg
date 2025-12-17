@@ -327,47 +327,47 @@ public class Player : MonoBehaviour
         var leftWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.left);
         if (leftWall)
         {
+            var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.left);
+            _isOnSlippery = slipperyHit.transform != null;
+            
             if (!_isTouchingLeftWall)
             {
                 var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.left);
-                StickToWall(-90f, hit.point);
+                StickToWall(-90f, hit.point, _isOnSlippery);
             }
-            
-            var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.left);
-            _isOnSlippery = slipperyHit.transform != null;
         }
         _isTouchingLeftWall = leftWall;
         
         var rightWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.right);
         if (rightWall)
         {
+            var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.right);
+            _isOnSlippery = slipperyHit.transform != null;
+            
             if (!_isTouchingRightWall)
             {
                 var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.right);
-                StickToWall(90f, hit.point);
+                StickToWall(90f, hit.point, _isOnSlippery);
             }
-            
-            var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.right);
-            _isOnSlippery = slipperyHit.transform != null;
         }
         _isTouchingRightWall = rightWall;
         
         var upWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.up);
         if (upWall)
         {
+            var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.up);
+            _isOnSlippery = slipperyHit.transform != null;
+            
             if (!_isTouchingUpWall)
             {
                 var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.up);
-                StickToWall(180f, hit.point);
+                StickToWall(180f, hit.point, _isOnSlippery);
             }
-            
-            var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.up);
-            _isOnSlippery = slipperyHit.transform != null;
         }
         _isTouchingUpWall = upWall;
     }
 
-    private void StickToWall(float surfaceAngle, Vector2 snapPoint)
+    private void StickToWall(float surfaceAngle, Vector2 snapPoint, bool slippery)
     {
         if(_falseSwing)
             StopSwing();
@@ -377,7 +377,8 @@ public class Player : MonoBehaviour
         _rb.gravityScale = 0;
         visual.rotation = Quaternion.Euler(new Vector3(0f, 0f, surfaceAngle));
         transform.position = snapPoint;
-        _rb.velocity = Vector2.zero;
+        if (!slippery)
+            _rb.velocity = Vector2.zero;
         _stickingSurfaceAngle = surfaceAngle;
         _isSticking = true;
     }
