@@ -328,7 +328,7 @@ public class Player : MonoBehaviour
         if (grounded && !_isGrounded)
             _spriteAnimator.SwitchAnimation("Land");
         if (slipperyHit && !_isOnSlippery)
-            _rb.velocityX = Mathf.Min(_rb.velocityX, 3f);
+            _rb.velocityX = Mathf.Min(Mathf.Abs(_rb.velocityX), 3f * Mathf.Sign(_rb.velocityX));
         
         _isOnSlippery = slipperyHit;
         _isGrounded = grounded;
