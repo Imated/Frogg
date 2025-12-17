@@ -6535,7 +6535,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 6.9722223
+  orthographic size: 15
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -7141,6 +7141,7 @@ MonoBehaviour:
   moveSpeedMin: 2
   moveSpeedMax: 5
   timeUntilMax: 0.65
+  slipSpeed: 10
   visual: {fileID: 734546514}
   sensSlider: {fileID: 859044698}
   slipperyLayerMask:
