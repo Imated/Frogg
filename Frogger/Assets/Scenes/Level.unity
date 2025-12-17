@@ -442,7 +442,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 1727270591}
-  amount: 0.6
+  amount: 0.8
 --- !u!212 &73405925
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -997,7 +997,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 1727270591}
-  amount: 0
+  amount: 0.5
 --- !u!212 &164869263
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -5435,7 +5435,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 1727270591}
-  amount: 0.45
+  amount: 0.7
 --- !u!212 &540320116
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -7250,7 +7250,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 1727270591}
-  amount: 0.3
+  amount: 0.6
 --- !u!212 &1536814374
 SpriteRenderer:
   m_ObjectHideFlags: 0
