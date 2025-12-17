@@ -7141,7 +7141,8 @@ MonoBehaviour:
   moveSpeedMin: 2
   moveSpeedMax: 5
   timeUntilMax: 0.65
-  slipSpeed: 10
+  groundMat: {fileID: 6200000, guid: 981e5a00a4ca40b468135cf794a9480f, type: 2}
+  slipMat: {fileID: 6200000, guid: b31d3f802d1b06f4ca2f0b6f7c43ff41, type: 2}
   visual: {fileID: 734546514}
   sensSlider: {fileID: 859044698}
   slipperyLayerMask:
