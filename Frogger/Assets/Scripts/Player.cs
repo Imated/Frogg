@@ -87,6 +87,7 @@ public class Player : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
         _inputManager.OnJump += OnJump;
         _inputManager.OnSwing += OnSwing;
+        RetractTongue();
     }
 
     private void Update()
@@ -111,6 +112,11 @@ public class Player : MonoBehaviour
         else
         {
             _rb.sharedMaterial = groundMat;
+        }
+
+        if (_isSticking)
+        {
+            _isGrounded = false;
         }
 
         _isUpsideDown = _isSticking && Mathf.Abs(_stickingSurfaceAngle) > 90f;
@@ -431,13 +437,10 @@ public class Player : MonoBehaviour
         if (!slippery)
         {
             _rb.velocity = Vector2.zero;
-            if (!Mathf.Approximately(Mathf.Abs(surfaceAngle), 180))
-            {
-                _stickingSurfaceAngle = surfaceAngle;
-                _isSticking = true;
-            }
         }
 
+        _stickingSurfaceAngle = surfaceAngle;
+        _isSticking = true;
     }
 
     private void UnStickToWall()
