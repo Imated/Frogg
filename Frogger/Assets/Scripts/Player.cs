@@ -19,6 +19,7 @@ public class Player : MonoBehaviour
     [SerializeField] private bool useController = false;
     [SerializeField] private float jumpHeightMin = 7.5f;
     [SerializeField] private float jumpHeightMax = 20f;    
+    [SerializeField] private AudioSource jumpSound;
     [SerializeField] private float moveSpeedMin = 7.5f;
     [SerializeField] private float moveSpeedMax = 20f;
     [SerializeField] private float timeUntilMax = 1f;
@@ -365,6 +366,8 @@ public class Player : MonoBehaviour
             _rb.AddForceY(-jumpForceY);
         _rb.AddForceX(jumpForceX);
         _chargeTime = 0f;
+
+        jumpSound.Play();
     }
     #endregion
     
