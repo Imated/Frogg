@@ -285,6 +285,13 @@ public class Player : MonoBehaviour
             _chargeTime += Time.deltaTime;
             _chargeTime = Mathf.Clamp(_chargeTime, 0f, timeUntilMax);
         }
+
+        if (!_isGrounded && !_isTouchingRightWall && !_isTouchingLeftWall && !_isTouchingUpWall)
+        {
+            _spriteAnimator.SwitchAnimation("Idle");
+            _isCharging = false;
+            _chargeTime = 0f;
+        }
     }
     
     private void OnJump(bool startedJumping)
