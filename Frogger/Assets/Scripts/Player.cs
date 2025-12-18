@@ -359,7 +359,7 @@ public class Player : MonoBehaviour
         var grounded = _raySensor.Cast(groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, groundLayerMask, Vector3.down);
         var slipperyHit = _raySensor.Cast(groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, slipperyLayerMask, Vector3.down);
         _isOnSlimey = _raySensor.Cast(groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, slimeLayerMask, Vector3.down);
-        if (grounded && !_isGrounded)
+        if (grounded && !_isGrounded && !_isSticking)
             _spriteAnimator.SwitchAnimation("Land");
         if (slipperyHit && !_isOnSlippery)
             _rb.velocityX = Mathf.Max(Mathf.Abs(_rb.velocityX), 6f) * Mathf.Sign(_rb.velocityX);
