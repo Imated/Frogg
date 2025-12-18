@@ -77,6 +77,7 @@ public class Player : MonoBehaviour
     private bool _isOnSlippery;
     private bool _isOnSlimey;
     private bool _isTongueOut;
+    private float _lastMoveSign = 1f;
 
     private void Awake()
     {
@@ -87,6 +88,11 @@ public class Player : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
         _inputManager.OnJump += OnJump;
         _inputManager.OnSwing += OnSwing;
+        RetractTongue();
+    }
+
+    private void Start()
+    {
         RetractTongue();
     }
 
@@ -118,6 +124,9 @@ public class Player : MonoBehaviour
         {
             _isGrounded = false;
         }
+        
+        if (Mathf.Abs(_rb.velocityX) > 0.1f)
+            _lastMoveSign = Mathf.Sign(_rb.velocityX);
 
         _isUpsideDown = _isSticking && Mathf.Abs(_stickingSurfaceAngle) > 90f;
 
@@ -367,7 +376,10 @@ public class Player : MonoBehaviour
         if (grounded && !_isGrounded && !_isSticking)
             _spriteAnimator.SwitchAnimation("Land");
         if (slipperyHit && !_isOnSlippery)
-            _rb.velocityX = Mathf.Max(Mathf.Abs(_rb.velocityX), 6f) * Mathf.Sign(_rb.velocityX);
+        {
+            var slideDir = Mathf.Abs(_rb.velocityX) < 0.1f ? _lastMoveSign : Mathf.Sign(_rb.velocityX);
+            _rb.velocityX = 6f * slideDir;
+        }
         
         _isOnSlippery = slipperyHit;
         _isGrounded = grounded;
