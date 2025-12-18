@@ -217,12 +217,6 @@ public class Player : MonoBehaviour
             _swingDirection = (pos - transform.position).normalized;
         }
         
-        if(_isTongueOut)
-            Swing();
-        else
-        {
-            tongueEnd.position = tongueStart.position;
-        }
         if (useController)
         {
             dot.gameObject.SetActive(true);
@@ -236,7 +230,17 @@ public class Player : MonoBehaviour
         else
             dot.gameObject.SetActive(false);
     }
-    
+
+    private void FixedUpdate()
+    {
+        if(_isTongueOut)
+            Swing();
+        else
+        {
+            tongueEnd.position = tongueStart.position;
+        }
+    }
+
     private void StartSwing()
     {
         if(_isTongueOut || _isTongueOut)
