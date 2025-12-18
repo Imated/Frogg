@@ -12155,7 +12155,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 15
+  orthographic size: 9.277778
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -13203,7 +13203,7 @@ AudioSource:
   m_GameObject: {fileID: 1597798362}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 243750194376176758, guid: ddfa55eb297a916439152b478e946fde, type: 2}
   m_audioClip: {fileID: 8300000, guid: c364c02c0fa1ecb44885132df8be93c2, type: 3}
   m_Resource: {fileID: 8300000, guid: c364c02c0fa1ecb44885132df8be93c2, type: 3}
   m_PlayOnAwake: 0
@@ -17597,7 +17597,7 @@ AudioSource:
   m_GameObject: {fileID: 2089264784}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 243750194376176758, guid: ddfa55eb297a916439152b478e946fde, type: 2}
   m_audioClip: {fileID: 8300000, guid: 445e8bff7577b364b9703aa026e79fea, type: 3}
   m_Resource: {fileID: 8300000, guid: 445e8bff7577b364b9703aa026e79fea, type: 3}
   m_PlayOnAwake: 0
