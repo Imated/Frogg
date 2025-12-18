@@ -161,9 +161,9 @@ public class Player : MonoBehaviour
                 _direction = -1;
         }
 
-        if (!_isOnSlimey && !_isOnSlippery)
+        if (!_isOnSlimey && !_isOnSlippery && _isSticking)
         {
-            _rb.gravityScale = 1.5f;
+            _rb.gravityScale = 0f;
         }
 
         if (!_isGrounded && !_isTouchingRightWall && !_isTouchingLeftWall && !_isTouchingUpWall)
