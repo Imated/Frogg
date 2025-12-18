@@ -378,7 +378,7 @@ public class Player : MonoBehaviour
         if (slipperyHit && !_isOnSlippery)
         {
             var slideDir = Mathf.Abs(_rb.velocityX) < 1f ? _lastMoveSign : Mathf.Sign(_rb.velocityX);
-            _rb.velocityX = Mathf.Max(6f * slideDir, _rb.velocityX);
+            _rb.velocityX = Mathf.Max(6f * slideDir, Mathf.Abs(_rb.velocityX) * slideDir);
         }
         
         _isOnSlippery = slipperyHit;
