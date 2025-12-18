@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 30b46bc3d66da7f4fbba2e630f0a43fd
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 232030
+  packageName: Volume Control 2
+  packageVersion: 2.0.1
+  assetPath: Assets/Plugins/Ilumisoft/Volume Control/Scripts/UI/Slider/VolumeSlider.cs
+  uploadId: 566765

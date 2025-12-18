@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 35efac9c322831642811e31c1cd4deb0
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 232030
+  packageName: Volume Control 2
+  packageVersion: 2.0.1
+  assetPath: Assets/Plugins/Ilumisoft/Volume Control/Prefabs/Volume Toggle.prefab
+  uploadId: 566765

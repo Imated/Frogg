@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5cb82b5058b086149965ceab36fde00c
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 232030
+  packageName: Volume Control 2
+  packageVersion: 2.0.1
+  assetPath: Assets/Plugins/Ilumisoft/Volume Control/Examples/Content/Prefabs/Example
+    UI.prefab
+  uploadId: 566765

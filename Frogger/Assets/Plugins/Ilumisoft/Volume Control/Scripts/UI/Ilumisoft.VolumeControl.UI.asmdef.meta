@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b25fca322416a254291b1ffd7db9b065
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 232030
+  packageName: Volume Control 2
+  packageVersion: 2.0.1
+  assetPath: Assets/Plugins/Ilumisoft/Volume Control/Scripts/UI/Ilumisoft.VolumeControl.UI.asmdef
+  uploadId: 566765

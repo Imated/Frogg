@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: dad995d3d1072f24fb89005752d8a5ca
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 232030
+  packageName: Volume Control 2
+  packageVersion: 2.0.1
+  assetPath: Assets/Plugins/Ilumisoft/Volume Control/Scripts/Core/PlayerPrefsStorage.cs
+  uploadId: 566765

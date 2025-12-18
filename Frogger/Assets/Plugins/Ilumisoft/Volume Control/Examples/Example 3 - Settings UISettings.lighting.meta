@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6c3503c19b2ab8346ae34113028075e6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 232030
+  packageName: Volume Control 2
+  packageVersion: 2.0.1
+  assetPath: Assets/Plugins/Ilumisoft/Volume Control/Examples/Example 3 - Settings
+    UISettings.lighting
+  uploadId: 566765
