@@ -346,8 +346,8 @@ public class Player : MonoBehaviour
         var jumpForceX = Mathf.Lerp(moveSpeedMin, moveSpeedMax, _chargeTime / timeUntilMax) * _direction * 10000;
         if (_isOnSlimey)
         {
-            jumpForceY /= 2f;
-            jumpForceX /= 2f;
+            jumpForceY /= 1.5f;
+            jumpForceX /= 1.5f;
         }
         
         if(!_isUpsideDown)
@@ -435,7 +435,7 @@ public class Player : MonoBehaviour
         if (!_isOnSlimey)
             _rb.gravityScale = 0;
         else
-            _rb.gravityScale = 0.5f;    
+            _rb.gravityScale = 0.1f;    
     
         visual.rotation = Quaternion.Euler(new Vector3(0f, 0f, surfaceAngle));
         transform.position = snapPoint;
