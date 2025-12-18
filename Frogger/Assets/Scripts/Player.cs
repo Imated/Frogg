@@ -377,8 +377,8 @@ public class Player : MonoBehaviour
             _spriteAnimator.SwitchAnimation("Land");
         if (slipperyHit && !_isOnSlippery)
         {
-            var slideDir = Mathf.Abs(_rb.velocityX) < 0.1f ? _lastMoveSign : Mathf.Sign(_rb.velocityX);
-            _rb.velocityX = 6f * slideDir;
+            var slideDir = Mathf.Abs(_rb.velocityX) < 1f ? _lastMoveSign : Mathf.Sign(_rb.velocityX);
+            _rb.velocityX = Mathf.Max(6f * slideDir, _rb.velocityX);
         }
         
         _isOnSlippery = slipperyHit;
