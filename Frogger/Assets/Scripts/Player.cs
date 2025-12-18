@@ -161,6 +161,11 @@ public class Player : MonoBehaviour
                 _direction = -1;
         }
 
+        if (!_isOnSlimey && !_isOnSlippery)
+        {
+            _rb.gravityScale = 1.5f;
+        }
+
         if (!_isGrounded && !_isTouchingRightWall && !_isTouchingLeftWall && !_isTouchingUpWall)
             UnStickToWall();
         if(_spriteAnimator.GetCurrentAnimation() == "Idle" && _isTongueOut)
