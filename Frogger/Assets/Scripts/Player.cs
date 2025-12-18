@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using DG.Tweening;
+using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -27,6 +28,8 @@ public class Player : MonoBehaviour
     [SerializeField] private Transform visual;
     [SerializeField] private Slider sensSlider;
     [SerializeField] private LayerMask slipperyLayerMask;
+    [SerializeField] private LayerMask slimeLayerMask;
+    [SerializeField] private LayerMask tongueStickLayerMask;
     [Header("Controller Settings")]
     [SerializeField, Range(0.001f, 0.1f)] private float sensitivity;
     [SerializeField, Range(0f, 1f)] private float deadzone = 0.4f;
@@ -72,6 +75,7 @@ public class Player : MonoBehaviour
     private Vector2 _swingDirection;
     private bool _falseSwing;
     private bool _isOnSlippery;
+    private bool _isOnSlimey;
     private bool _isTongueOut;
 
     private void Awake()
@@ -216,18 +220,26 @@ public class Player : MonoBehaviour
     {
         if(_isTongueOut || _isTongueOut)
             return;
-        var (direction, hit) = GetSwingPointInfo();
+        var info = GetSwingPointInfo();
         if (_canSwing)
         {
-            targetSwingObject.transform.position = hit;
-            _distanceJoint.enabled = true;
-            _rb.drag = 0.25f;
-            Invoke(nameof(StopSwing), 5f);
-            ExtendTongue(targetSwingObject.transform.position);
+            targetSwingObject.transform.position = info.point;
+            var isSlime = ((1 << info.transform.gameObject.layer) & slimeLayerMask) != 0;
+            if (isSlime)
+            {
+                ExtendTongue(targetSwingObject.transform.position, () => RetractTongue());
+            }
+            else
+            {
+                _distanceJoint.enabled = true;
+                _rb.drag = 0.25f;
+                Invoke(nameof(StopSwing), 5f);
+                ExtendTongue(targetSwingObject.transform.position);
+            }
         }
         else
         {
-            targetSwingObject.transform.position = transform.position + direction * tongueLength;
+            targetSwingObject.transform.position = transform.position + (Vector3) _swingDirection * tongueLength;
             ExtendTongue(targetSwingObject.transform.position, () => RetractTongue());
         }
     }
@@ -265,14 +277,14 @@ public class Player : MonoBehaviour
     
     private bool CanSwing()
     {
-        var hit = _raySensor.CastHit(tongueLength, 0f, 0f, groundLayerMask, _swingDirection);
+        var hit = _raySensor.CastHit(tongueLength, 0f, 0f, tongueStickLayerMask, _swingDirection);
         return hit.collider != null;
     }
 
-    private (Vector3, Vector3) GetSwingPointInfo()
+    private RaycastHit2D GetSwingPointInfo()
     {
-        var hit = _raySensor.CastHit(tongueLength, 0f, 0f, groundLayerMask, _swingDirection);
-        return (_swingDirection, hit.point);
+        var hit = _raySensor.CastHit(tongueLength, 0f, 0f, tongueStickLayerMask, _swingDirection);
+        return hit;
     }
 
     #endregion
@@ -319,11 +331,19 @@ public class Player : MonoBehaviour
             return;
         _isCharging = false;
         _spriteAnimator.SwitchAnimation("Jump");
+        var jumpForceY = Mathf.Lerp(jumpHeightMin, jumpHeightMax, _chargeTime / timeUntilMax) * 10000;
+        var jumpForceX = Mathf.Lerp(moveSpeedMin, moveSpeedMax, _chargeTime / timeUntilMax) * _direction * 10000;
+        if (_isOnSlimey)
+        {
+            jumpForceY /= 2f;
+            jumpForceX /= 2f;
+        }
+        
         if(!_isUpsideDown)
-            _rb.AddForceY(Mathf.Lerp(jumpHeightMin, jumpHeightMax, _chargeTime / timeUntilMax) * 10000);
+            _rb.AddForceY(jumpForceY);
         else
-            _rb.AddForceY(Mathf.Lerp(jumpHeightMin, jumpHeightMax, _chargeTime / timeUntilMax) * -10000);
-        _rb.AddForceX(Mathf.Lerp(moveSpeedMin, moveSpeedMax, _chargeTime / timeUntilMax) * _direction * 10000);
+            _rb.AddForceY(-jumpForceY);
+        _rb.AddForceX(jumpForceX);
         _chargeTime = 0f;
     }
     #endregion
@@ -332,6 +352,7 @@ public class Player : MonoBehaviour
     {
         var grounded = _raySensor.Cast(groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, groundLayerMask, Vector3.down);
         var slipperyHit = _raySensor.Cast(groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, slipperyLayerMask, Vector3.down);
+        _isOnSlimey = _raySensor.Cast(groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, slimeLayerMask, Vector3.down);
         if (grounded && !_isGrounded)
             _spriteAnimator.SwitchAnimation("Land");
         if (slipperyHit && !_isOnSlippery)
@@ -349,6 +370,8 @@ public class Player : MonoBehaviour
         {
             var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.left);
             _isOnSlippery = slipperyHit.transform != null;
+
+            _isOnSlimey = _raySensor.Cast(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, slimeLayerMask, Vector3.left);
             
             if (!_isTouchingLeftWall)
             {
@@ -364,6 +387,8 @@ public class Player : MonoBehaviour
             var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.right);
             _isOnSlippery = slipperyHit.transform != null;
             
+            _isOnSlimey = _raySensor.Cast(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, slimeLayerMask, Vector3.right);
+            
             if (!_isTouchingRightWall)
             {
                 var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.right);
@@ -377,6 +402,8 @@ public class Player : MonoBehaviour
         {
             var slipperyHit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, slipperyLayerMask, Vector3.up);
             _isOnSlippery = slipperyHit.transform != null;
+            
+            _isOnSlimey = _raySensor.Cast(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, slimeLayerMask, Vector3.up);
             
             if (!_isTouchingUpWall)
             {
@@ -394,7 +421,11 @@ public class Player : MonoBehaviour
         if(_isSticking)
             return;
         _spriteAnimator.SwitchAnimation("Land");
-        _rb.gravityScale = 0;
+        if (!_isOnSlimey)
+            _rb.gravityScale = 0;
+        else
+            _rb.gravityScale = 0.5f;    
+    
         visual.rotation = Quaternion.Euler(new Vector3(0f, 0f, surfaceAngle));
         transform.position = snapPoint;
         if (!slippery)
