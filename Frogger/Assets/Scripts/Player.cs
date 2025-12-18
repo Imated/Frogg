@@ -429,9 +429,15 @@ public class Player : MonoBehaviour
         visual.rotation = Quaternion.Euler(new Vector3(0f, 0f, surfaceAngle));
         transform.position = snapPoint;
         if (!slippery)
+        {
             _rb.velocity = Vector2.zero;
-        _stickingSurfaceAngle = surfaceAngle;
-        _isSticking = true;
+            if (!Mathf.Approximately(Mathf.Abs(surfaceAngle), 180))
+            {
+                _stickingSurfaceAngle = surfaceAngle;
+                _isSticking = true;
+            }
+        }
+
     }
 
     private void UnStickToWall()
