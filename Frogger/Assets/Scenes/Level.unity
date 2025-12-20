@@ -2054,7 +2054,7 @@ TilemapCollider2D:
   m_Offset: {x: 0, y: 0}
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
-  m_UseDelaunayMesh: 0
+  m_UseDelaunayMesh: 1
 --- !u!483693784 &339146122
 TilemapRenderer:
   m_ObjectHideFlags: 0
@@ -35935,7 +35935,7 @@ CompositeCollider2D:
       - {x: -333.99997, y: -34}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
-  m_UseDelaunayMesh: 0
+  m_UseDelaunayMesh: 1
   m_CompositeGameObject: {fileID: 339146119}
 --- !u!1 &352449334
 GameObject:
@@ -37754,7 +37754,7 @@ Transform:
   m_GameObject: {fileID: 1283387910}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -183.6, y: -6.2, z: -10}
+  m_LocalPosition: {x: 80.9, y: 249.6, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -38542,7 +38542,7 @@ Transform:
   m_GameObject: {fileID: 1519990049}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -187.6, y: -11.2, z: 0}
+  m_LocalPosition: {x: 76.9, y: 244.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -39290,7 +39290,7 @@ CompositeCollider2D:
       - {x: -83.99997, y: 184}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
-  m_UseDelaunayMesh: 0
+  m_UseDelaunayMesh: 1
   m_CompositeGameObject: {fileID: 1623818858}
 --- !u!50 &1623818861
 Rigidbody2D:
@@ -39356,7 +39356,7 @@ TilemapCollider2D:
   m_Offset: {x: 0, y: 0}
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
-  m_UseDelaunayMesh: 0
+  m_UseDelaunayMesh: 1
 --- !u!483693784 &1623818863
 TilemapRenderer:
   m_ObjectHideFlags: 0
@@ -40363,7 +40363,7 @@ Transform:
   m_GameObject: {fileID: 1727270591}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -183.6, y: -6.2, z: -10}
+  m_LocalPosition: {x: 80.9, y: 249.6, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -40443,7 +40443,7 @@ TilemapCollider2D:
   m_Offset: {x: 0, y: 0}
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
-  m_UseDelaunayMesh: 0
+  m_UseDelaunayMesh: 1
 --- !u!483693784 &1734730909
 TilemapRenderer:
   m_ObjectHideFlags: 0
@@ -92149,7 +92149,7 @@ CompositeCollider2D:
       - {x: 92.00003, y: 14}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
-  m_UseDelaunayMesh: 0
+  m_UseDelaunayMesh: 1
   m_CompositeGameObject: {fileID: 1734730906}
 --- !u!50 &1734730912
 Rigidbody2D:
