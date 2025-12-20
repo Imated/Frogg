@@ -399,7 +399,7 @@ public class Player : MonoBehaviour
 
     private void WallCheck()
     {
-        Debug.Log("Performing Slip check...");
+        //Debug.Log("Performing Slip check...");
         var leftWall = _raySensor.CastAll(wallRayLength, wallRayOffset, wallRayXOffset, wallSideRayOffset, wallLayerMask, Vector3.left);
         if (leftWall)
         {
