@@ -5,6 +5,7 @@ using UnityEngine;
 public class C4 : MonoBehaviour
 {
     [SerializeField] private Vector2 force;
+    [SerializeField] private AudioSource soundSource;
 
     private Collider2D col;
     private SpriteRenderer sr;
@@ -23,6 +24,7 @@ public class C4 : MonoBehaviour
             rb.AddForce(force * 10000);
 
             StartCoroutine(nameof(Respawn));
+            soundSource.Play();
 
             col.enabled = false;
             sr.enabled = false;

@@ -31,6 +31,11 @@ public class Player : MonoBehaviour
     [SerializeField] private LayerMask slipperyLayerMask;
     [SerializeField] private LayerMask slimeLayerMask;
     [SerializeField] private LayerMask tongueStickLayerMask;
+    [SerializeField] private AudioClip grassLand;
+    [SerializeField] private AudioClip iceLand;
+    [SerializeField] private AudioClip slimeLand;
+    [SerializeField] private AudioClip slimeTongue;
+    [SerializeField] private AudioSource soundSource;
     [Header("Controller Settings")]
     [SerializeField, Range(0.001f, 0.1f)] private float sensitivity;
     [SerializeField, Range(0f, 1f)] private float deadzone = 0.4f;
@@ -252,20 +257,20 @@ public class Player : MonoBehaviour
             var isSlime = ((1 << info.transform.gameObject.layer) & slimeLayerMask) != 0;
             if (isSlime)
             {
-                ExtendTongue(targetSwingObject.transform.position, () => RetractTongue());
+                ExtendTongue(targetSwingObject.transform.position, info, () => RetractTongue());
             }
             else
             {
                 _distanceJoint.enabled = true;
                 _rb.drag = 0.25f;
                 Invoke(nameof(StopSwing), 5f);
-                ExtendTongue(targetSwingObject.transform.position);
+                ExtendTongue(targetSwingObject.transform.position, info);
             }
         }
         else
         {
             targetSwingObject.transform.position = transform.position + (Vector3) _swingDirection * tongueLength;
-            ExtendTongue(targetSwingObject.transform.position, () => RetractTongue());
+            ExtendTongue(targetSwingObject.transform.position, info, () => RetractTongue());
         }
     }
     
@@ -285,10 +290,28 @@ public class Player : MonoBehaviour
         _rb.drag = 0;
     }
 
-    private void ExtendTongue(Vector3 to, TweenCallback onComplete = null)
+    private void ExtendTongue(Vector3 to, RaycastHit2D info, TweenCallback onComplete = null)
     {
         _isTongueOut = true;
         _tongueExtendTween = tongueEnd.DOMove(to, 0.3f).OnComplete(onComplete);
+        if (onComplete == null)
+        {
+            if (info.transform.gameObject.layer == LayerMask.NameToLayer("Slime"))
+            {
+                soundSource.clip = slimeTongue;
+                soundSource.Play();
+            }
+            else if (info.transform.gameObject.layer == LayerMask.NameToLayer("Slippery"))
+            {
+                soundSource.clip = iceLand;
+                soundSource.Play();
+            }
+            else
+            {
+                soundSource.clip = grassLand;
+                soundSource.Play();
+            }
+        }
     }
 
     private void RetractTongue(TweenCallback onComplete = null)
@@ -381,7 +404,24 @@ public class Player : MonoBehaviour
         var slipperyHit = _raySensor.Cast(groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, slipperyLayerMask, Vector3.down);
         _isOnSlimey = _raySensor.Cast(groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, slimeLayerMask, Vector3.down);
         if (grounded && !_isGrounded && !_isSticking)
+        {
             _spriteAnimator.SwitchAnimation("Land");
+            if (!_isOnSlimey && !_isOnSlippery)
+            {
+                soundSource.clip = grassLand;
+                soundSource.Play();
+            }
+            else if (_isOnSlimey)
+            {
+                soundSource.clip = slimeLand;
+                soundSource.Play();
+            }
+            else if (_isOnSlippery)
+            {
+                soundSource.clip = iceLand;
+                soundSource.Play();
+            }
+        }
         if (slipperyHit && !_isOnSlippery)
         {
             var slideDir = Mathf.Abs(_rb.velocityX) < 1f ? _lastMoveSign : Mathf.Sign(_rb.velocityX);
