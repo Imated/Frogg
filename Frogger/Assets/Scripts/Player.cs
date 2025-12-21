@@ -403,6 +403,19 @@ public class Player : MonoBehaviour
         var grounded = _raySensor.Cast(groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, groundLayerMask, Vector3.down);
         var slipperyHit = _raySensor.Cast(groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, slipperyLayerMask, Vector3.down);
         _isOnSlimey = _raySensor.Cast(groundRayLength, groundRayOffset, groundRayXOffset, groundSideRayOffset, slimeLayerMask, Vector3.down);
+        if (slipperyHit && !_isOnSlippery)
+        {
+            var slideDir = Mathf.Abs(_rb.velocityX) < 1f ? _lastMoveSign : Mathf.Sign(_rb.velocityX);
+            var speed = Mathf.Abs(_rb.velocityX);
+
+            if (speed < 1f) 
+                speed = 6f;
+
+            _rb.velocityX = speed * slideDir;
+        }
+        
+        _isOnSlippery = slipperyHit;
+        
         if (grounded && !_isGrounded && !_isSticking)
         {
             _spriteAnimator.SwitchAnimation("Land");
@@ -422,18 +435,6 @@ public class Player : MonoBehaviour
                 soundSource.Play();
             }
         }
-        if (slipperyHit && !_isOnSlippery)
-        {
-            var slideDir = Mathf.Abs(_rb.velocityX) < 1f ? _lastMoveSign : Mathf.Sign(_rb.velocityX);
-            var speed = Mathf.Abs(_rb.velocityX);
-
-            if (speed < 1f) 
-                speed = 6f;
-
-            _rb.velocityX = speed * slideDir;
-        }
-        
-        _isOnSlippery = slipperyHit;
         _isGrounded = grounded;
     }
 
@@ -452,6 +453,21 @@ public class Player : MonoBehaviour
             {
                 var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.left);
                 StickToWall(-90f, hit.point, _isOnSlippery);
+                if (!_isOnSlimey && !_isOnSlippery)
+                {
+                    soundSource.clip = grassLand;
+                    soundSource.Play();
+                }
+                else if (_isOnSlimey)
+                {
+                    soundSource.clip = slimeLand;
+                    soundSource.Play();
+                }
+                else if (_isOnSlippery)
+                {
+                    soundSource.clip = iceLand;
+                    soundSource.Play();
+                }
             }
         }
         _isTouchingLeftWall = leftWall;
@@ -468,6 +484,21 @@ public class Player : MonoBehaviour
             {
                 var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.right);
                 StickToWall(90f, hit.point, _isOnSlippery);
+                if (!_isOnSlimey && !_isOnSlippery)
+                {
+                    soundSource.clip = grassLand;
+                    soundSource.Play();
+                }
+                else if (_isOnSlimey)
+                {
+                    soundSource.clip = slimeLand;
+                    soundSource.Play();
+                }
+                else if (_isOnSlippery)
+                {
+                    soundSource.clip = iceLand;
+                    soundSource.Play();
+                }
             }
         }
         _isTouchingRightWall = rightWall;
@@ -484,6 +515,21 @@ public class Player : MonoBehaviour
             {
                 var hit = _raySensor.CastHit(wallRayLength, wallRayOffset, wallRayXOffset, wallLayerMask, Vector3.up);
                 StickToWall(180f, hit.point, _isOnSlippery);
+                if (!_isOnSlimey && !_isOnSlippery)
+                {
+                    soundSource.clip = grassLand;
+                    soundSource.Play();
+                }
+                else if (_isOnSlimey)
+                {
+                    soundSource.clip = slimeLand;
+                    soundSource.Play();
+                }
+                else if (_isOnSlippery)
+                {
+                    soundSource.clip = iceLand;
+                    soundSource.Play();
+                }
             }
         }
         _isTouchingUpWall = upWall;
