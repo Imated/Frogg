@@ -2054,7 +2054,7 @@ TilemapCollider2D:
   m_Offset: {x: 0, y: 0}
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
-  m_UseDelaunayMesh: 1
+  m_UseDelaunayMesh: 0
 --- !u!483693784 &339146122
 TilemapRenderer:
   m_ObjectHideFlags: 0
@@ -39356,7 +39356,7 @@ TilemapCollider2D:
   m_Offset: {x: 0, y: 0}
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
-  m_UseDelaunayMesh: 1
+  m_UseDelaunayMesh: 0
 --- !u!483693784 &1623818863
 TilemapRenderer:
   m_ObjectHideFlags: 0
@@ -40443,7 +40443,7 @@ TilemapCollider2D:
   m_Offset: {x: 0, y: 0}
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
-  m_UseDelaunayMesh: 1
+  m_UseDelaunayMesh: 0
 --- !u!483693784 &1734730909
 TilemapRenderer:
   m_ObjectHideFlags: 0
